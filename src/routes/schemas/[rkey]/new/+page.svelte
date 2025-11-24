@@ -23,6 +23,7 @@
 		if (!$session) return
 
 		const rkey = $page.params.rkey
+		if (!rkey) return
 
 		try {
 			schema = await clayprotoSDK.getSchema(rkey)

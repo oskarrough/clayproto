@@ -1,26 +1,27 @@
 <script lang="ts">
 	import {onMount} from 'svelte'
+	import {replaceState} from '$app/navigation'
 	import favicon from '$lib/assets/favicon.svg'
 	import {atprotoOAuth, buildClientId} from '$lib/atproto-oauth'
-	import {session} from '$lib/session'
+	import {refreshSession} from '$lib/session'
 
 	let {children} = $props()
 	let ready = $state(false)
 
 	onMount(async () => {
 		try {
-			const clientId = buildClientId()
-			await atprotoOAuth.init(clientId)
+			await atprotoOAuth.init(buildClientId())
 
-			// Restore session if we have a stored DID
-			if (!atprotoOAuth.session) {
-				const did = atprotoOAuth.getStoredDid()
-				if (did) {
-					await atprotoOAuth.restoreSession(did)
-				}
+			if (await atprotoOAuth.handleCallback()) {
+				replaceState(window.location.pathname, {})
 			}
 
-			session.refresh()
+			const did = atprotoOAuth.getStoredDid()
+			if (!atprotoOAuth.session && did) {
+				await atprotoOAuth.restoreSession(did)
+			}
+
+			refreshSession()
 		} catch (err) {
 			console.error('OAuth init error:', err)
 		} finally {

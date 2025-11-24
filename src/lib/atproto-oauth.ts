@@ -1,4 +1,4 @@
-import {BrowserOAuthClient} from '@atproto/oauth-client-browser'
+import {BrowserOAuthClient, buildLoopbackClientId} from '@atproto/oauth-client-browser'
 import type {OAuthSession} from '@atproto/oauth-client-browser'
 import {Agent} from '@atproto/api'
 
@@ -11,49 +11,39 @@ class AtprotoOAuthService {
 	client: BrowserOAuthClient | null = null
 	agent: Agent | null = null
 	session: Session | null = null
-	initialized = false
-	initPromise: Promise<void> | null = null
+	private initPromise: Promise<void> | null = null
 
 	async init(clientId: string): Promise<void> {
-		if (this.initialized) return
-		if (this.initPromise) return this.initPromise
-
-		this.initPromise = this.#initInternal(clientId).finally(() => {
-			this.initPromise = null
-		})
-		return this.initPromise
-	}
-
-	async #initInternal(clientId: string): Promise<void> {
-		if (this.initialized) return
-
-		this.client = await BrowserOAuthClient.load({
+		if (this.client) return
+		return (this.initPromise ??= BrowserOAuthClient.load({
 			clientId,
 			handleResolver: 'https://bsky.social'
-		})
+		}).then((client) => {
+			this.client = client
+		}))
+	}
 
-		// Handle OAuth callback if present in URL
+	async handleCallback(): Promise<boolean> {
+		if (!this.client) return false
+
 		const params = this.client.readCallbackParams()
-		if (params) {
-			try {
-				const {session} = await this.client.initCallback(params)
-				await this.#hydrateSession(session)
-			} catch (err) {
-				// Clear URL params on error
-				history.replaceState(null, '', location.pathname)
-				console.error('OAuth callback failed:', err)
-			}
-		}
+		if (!params) return false
 
-		this.initialized = true
+		try {
+			const {session} = await this.client.initCallback(params)
+			await this.#hydrateSession(session)
+			return true
+		} catch (err) {
+			console.error('OAuth callback failed:', err)
+			return false
+		}
 	}
 
 	async signIn(handle: string): Promise<void> {
 		if (!this.client) throw new Error('OAuth client not initialized')
 
 		await this.client.signIn(handle, {
-			state: window.location.pathname,
-			scope: 'atproto transition:generic'
+			state: window.location.pathname
 		})
 	}
 
@@ -75,38 +65,24 @@ class AtprotoOAuthService {
 
 	async signOut(): Promise<void> {
 		if (this.session?.did && this.client) {
-			try {
-				await this.client.revoke(this.session.did)
-			} catch (err) {
-				console.error('Revoke error:', err)
-			}
+			await this.client.revoke(this.session.did).catch(console.error)
 		}
-
 		this.agent = null
 		this.session = null
 		localStorage.removeItem('atproto-did')
 	}
 
-	getStoredDid(): string | null {
-		try {
-			return localStorage.getItem('atproto-did')
-		} catch {
-			return null
-		}
-	}
-
-	isAuthenticated(): boolean {
-		return !!this.agent && !!this.session
-	}
+	getStoredDid = () => localStorage.getItem('atproto-did')
+	isAuthenticated = () => !!(this.agent && this.session)
 
 	async #hydrateSession(oauthSession: OAuthSession): Promise<void> {
 		this.agent = new Agent(oauthSession)
 
 		// Try to resolve handle
-		let handle = oauthSession.did
+		let handle: string = oauthSession.did
 		try {
 			const publicAgent = new Agent({service: 'https://public.api.bsky.app'})
-			const profile = await publicAgent.getProfile({actor: oauthSession.did})
+			const profile = await publicAgent.getProfile({actor: oauthSession.did as `did:plc:${string}`})
 			handle = profile.data?.handle || handle
 		} catch {
 			// Use DID as handle fallback
@@ -119,13 +95,26 @@ class AtprotoOAuthService {
 
 export const atprotoOAuth = new AtprotoOAuthService()
 
+// Scopes for clayproto - identity + schema CRUD
+const scopes = [
+	'atproto',
+	'repo:app.clayproto.schema?action=create',
+	'repo:app.clayproto.schema?action=update',
+	'repo:app.clayproto.schema?action=delete'
+].join(' ')
+
 // Helper to build client ID for dev vs prod
 export function buildClientId(): string {
-	const {protocol, host} = window.location
-	if (protocol === 'http:') {
-		// Loopback client for local dev
-		return `http://localhost?redirect_uri=${encodeURIComponent(`${protocol}//${host}/`)}&scope=${encodeURIComponent('atproto transition:generic')}`
+	if (window.location.protocol === 'http:') {
+		// Loopback client for local dev - must use root path only
+		const loc = {
+			hostname: window.location.hostname,
+			pathname: '/',
+			port: window.location.port
+		}
+		const base = buildLoopbackClientId(loc)
+		return `${base}&scope=${encodeURIComponent(scopes)}`
 	}
 	// Production: use client-metadata.json
-	return `${protocol}//${host}/client-metadata.json`
+	return `${window.location.protocol}//${window.location.host}/client-metadata.json`
 }

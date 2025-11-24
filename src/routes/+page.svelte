@@ -1,19 +1,17 @@
 <script lang="ts">
-	import {session} from '$lib/session'
+	import {dev} from '$app/environment'
+	import {session, refreshSession} from '$lib/session'
 	import {atprotoOAuth} from '$lib/atproto-oauth'
-	import {goto} from '$app/navigation'
 
-	let handle = $state('')
+	let handle = $state(dev ? 'oskarrough.bsky.social' : '')
 	let signingIn = $state(false)
 	let error = $state('')
 
-	async function handleSignIn(e: SubmitEvent) {
+	async function signIn(e: SubmitEvent) {
 		e.preventDefault()
 		if (!handle.trim()) return
-
 		error = ''
 		signingIn = true
-
 		try {
 			await atprotoOAuth.signIn(handle.trim())
 		} catch (err) {
@@ -22,9 +20,9 @@
 		}
 	}
 
-	async function handleSignOut() {
+	async function signOut() {
 		await atprotoOAuth.signOut()
-		session.refresh()
+		refreshSession()
 	}
 </script>
 
@@ -36,9 +34,9 @@
 	<nav>
 		<a href="/schemas">My Schemas</a>
 	</nav>
-	<button type="button" onclick={handleSignOut}>Logout</button>
+	<button type="button" onclick={signOut}>Logout</button>
 {:else}
-	<form onsubmit={handleSignIn}>
+	<form onsubmit={signIn}>
 		<input
 			type="text"
 			bind:value={handle}

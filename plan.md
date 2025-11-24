@@ -38,11 +38,15 @@ Minimal, malleable POC. Single routes for each purpose:
 3. ✅ Create SDK class to wrap ATProto API calls
 4. ✅ Define Lexicon schemas for app.clayproto.schema and app.clayproto.item
 5. ✅ Build schema builder UI (form to create schema definitions)
-6. ✅ Implement schema CRUD operations
+6. ✅ Implement schema CRUD operations (create, read, update, delete all wired)
 7. ✅ Build dynamic form generator (reads schema, generates input form)
 8. ✅ Implement item CRUD operations (SDK done, routes wired)
 9. ✅ Build list/view UI for items (/schemas/[rkey] shows items)
-10. Fix type errors and test full flow
+10. ✅ Refactor for elegance (field builder factory, cache helper, reduced LOC)
+11. Item edit/delete UI
+12. Item detail view (/schemas/[rkey]/items/[itemRkey])
+13. Test full flow end-to-end
+14. Basic styling
 
 ## OPEN QUESTIONS
 

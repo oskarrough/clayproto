@@ -9,6 +9,21 @@
 	let items = $state<{rkey: string; item: ItemData}[]>([])
 	let loading = $state(true)
 	let error = $state('')
+	let deleting = $state(false)
+
+	async function handleDelete() {
+		const {rkey} = $page.params
+		if (!rkey || !confirm('Delete this schema? This cannot be undone.')) return
+
+		deleting = true
+		try {
+			await clayprotoSDK.deleteSchema(rkey)
+			goto('/schemas')
+		} catch (err) {
+			error = (err as Error).message
+			deleting = false
+		}
+	}
 
 	$effect(() => {
 		if (!$session) {
@@ -18,13 +33,12 @@
 
 	onMount(async () => {
 		if (!$session) return
-
-		const rkey = $page.params.rkey
+		const {rkey} = $page.params
+		if (!rkey) return
 
 		try {
 			schema = await clayprotoSDK.getSchema(rkey)
-			const allItems = await clayprotoSDK.listItems()
-			items = allItems.filter((item) => item.item.schemaType === schema!.nsid)
+			items = await clayprotoSDK.listItemsBySchema(schema.nsid)
 		} catch (err) {
 			error = (err as Error).message
 		} finally {
@@ -40,6 +54,13 @@
 {:else if schema}
 	<h1>{schema.title}</h1>
 	<p><code>{schema.nsid}</code></p>
+
+	<p>
+		<a href="/schemas/{$page.params.rkey}/edit">Edit</a>
+		<button onclick={handleDelete} disabled={deleting}>
+			{deleting ? 'Deleting...' : 'Delete'}
+		</button>
+	</p>
 
 	{#if schema.description}
 		<p>{schema.description}</p>
@@ -72,7 +93,7 @@
 		<p>No items yet.</p>
 	{:else}
 		<ul>
-			{#each items as {rkey, item} (rkey)}
+			{#each items as { rkey, item } (rkey)}
 				<li>
 					{#each schema.fields.slice(0, 2) as field (field.name)}
 						{#if item.data[field.name]}

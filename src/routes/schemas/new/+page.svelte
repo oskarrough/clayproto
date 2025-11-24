@@ -3,6 +3,7 @@
 	import {goto} from '$app/navigation'
 	import {session} from '$lib/session'
 	import {clayprotoSDK, type SchemaField} from '$lib/clayproto-sdk'
+	import type {Snapshot} from './$types'
 
 	let nsid = $state('')
 	let title = $state('')
@@ -10,6 +11,24 @@
 	let fields = $state<SchemaField[]>([])
 	let submitting = $state(false)
 	let error = $state('')
+
+	// Preserve form data across navigation
+	interface FormSnapshot {
+		nsid: string
+		title: string
+		description: string
+		fields: SchemaField[]
+	}
+
+	export const snapshot: Snapshot<FormSnapshot> = {
+		capture: () => ({nsid, title, description, fields}),
+		restore: (value) => {
+			nsid = value.nsid
+			title = value.title
+			description = value.description
+			fields = value.fields
+		}
+	}
 
 	onMount(() => {
 		if (!$session) {

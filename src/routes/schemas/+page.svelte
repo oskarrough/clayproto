@@ -26,17 +26,16 @@
 
 <h1>Schemas</h1>
 
-<a href="/schemas/new">Create New Schema</a>
-
 {#if loading}
 	<p>Loading...</p>
 {:else if error}
 	<p style="color: red">{error}</p>
 {:else if schemas.length === 0}
-	<p>No schemas yet. Create your first schema to get started.</p>
+	<p>No schemas yet. <a href="/schemas/new">Create your first schema</a></p>
 {:else}
+	<p><a href="/schemas/new">Create New Schema</a></p>
 	<ul>
-		{#each schemas as {rkey, schema} (rkey)}
+		{#each schemas as { rkey, schema } (rkey)}
 			<li>
 				<a href="/schemas/{rkey}">
 					<strong>{schema.title}</strong> ({schema.nsid})

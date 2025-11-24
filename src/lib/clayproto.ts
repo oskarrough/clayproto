@@ -58,66 +58,24 @@ export interface QueryOptions<T = unknown> {
 // FIELD BUILDERS
 // ============================================================================
 
-/**
- * Creates a string field builder
- */
-export function string(config: FieldConfig = {}): FieldBuilder<string | null> {
-	return {
-		_type: 'string',
-		_config: config,
-		_infer: undefined as unknown as string | null
-	}
-}
+const field = <T, C extends FieldConfig = FieldConfig>(
+	type: FieldBuilder<T>['_type'],
+	config: C
+): FieldBuilder<T> => ({
+	_type: type,
+	_config: config,
+	_infer: undefined as unknown as T
+})
 
-/**
- * Creates a number field builder
- */
-export function number(config: FieldConfig = {}): FieldBuilder<number | null> {
-	return {
-		_type: 'number',
-		_config: config,
-		_infer: undefined as unknown as number | null
-	}
-}
+export const string = (config: FieldConfig = {}) => field<string | null>('string', config)
+export const number = (config: FieldConfig = {}) => field<number | null>('number', config)
+export const boolean = (config: FieldConfig = {}) => field<boolean | null>('boolean', config)
 
-/**
- * Creates a boolean field builder
- */
-export function boolean(config: FieldConfig = {}): FieldBuilder<boolean | null> {
-	return {
-		_type: 'boolean',
-		_config: config,
-		_infer: undefined as unknown as boolean | null
-	}
-}
+export const ref = <T = unknown>(schema: string, config: Omit<RefConfig, 'schema'> = {}) =>
+	field<T | null, RefConfig>('ref', {...config, schema})
 
-/**
- * Creates a reference field builder
- */
-export function ref<T = unknown>(
-	schema: string,
-	config: Omit<RefConfig, 'schema'> = {}
-): FieldBuilder<T | null> {
-	return {
-		_type: 'ref',
-		_config: {...config, schema},
-		_infer: undefined as unknown as T | null
-	}
-}
-
-/**
- * Creates an array field builder
- */
-export function array<T>(
-	items: FieldBuilder<T>,
-	config: Omit<ArrayConfig, 'items'> = {}
-): FieldBuilder<T[]> {
-	return {
-		_type: 'array',
-		_config: {...config, items},
-		_infer: undefined as unknown as T[]
-	}
-}
+export const array = <T>(items: FieldBuilder<T>, config: Omit<ArrayConfig, 'items'> = {}) =>
+	field<T[], ArrayConfig>('array', {...config, items})
 
 // ============================================================================
 // SCHEMA REGISTRY
@@ -154,9 +112,13 @@ class SchemaRegistry {
 // VALIDATION
 // ============================================================================
 
-/**
- * Validates data against a schema builder
- */
+const typeChecks: Record<string, (v: unknown) => string | null> = {
+	string: (v) => (typeof v === 'string' ? null : 'Must be a string'),
+	number: (v) => (typeof v === 'number' ? null : 'Must be a number'),
+	boolean: (v) => (typeof v === 'boolean' ? null : 'Must be a boolean'),
+	ref: (v) => (typeof v === 'string' ? null : 'Reference must be a string (rkey)')
+}
+
 export function validate<S extends SchemaBuilder>(
 	schemaBuilder: S,
 	data: Record<string, unknown>
@@ -165,87 +127,35 @@ export function validate<S extends SchemaBuilder>(
 
 	for (const [fieldName, fieldBuilder] of Object.entries(schemaBuilder)) {
 		const value = data[fieldName]
-		const config = fieldBuilder._config
+		const {required, nullable} = fieldBuilder._config
 
-		// Check required
-		if (config.required && (value === undefined || value === null)) {
-			errors.push({
-				field: fieldName,
-				message: 'Required field'
-			})
+		if (required && value == null) {
+			errors.push({field: fieldName, message: 'Required field'})
 			continue
 		}
 
-		// Skip validation if value is null/undefined and field is nullable/optional
-		if ((value === null || value === undefined) && (config.nullable || !config.required)) {
-			continue
-		}
+		if (value == null && (nullable || !required)) continue
 
-		// Type validation
-		switch (fieldBuilder._type) {
-			case 'string':
-				if (typeof value !== 'string') {
-					errors.push({
-						field: fieldName,
-						message: 'Must be a string'
-					})
-				}
-				break
-
-			case 'number':
-				if (typeof value !== 'number') {
-					errors.push({
-						field: fieldName,
-						message: 'Must be a number'
-					})
-				}
-				break
-
-			case 'boolean':
-				if (typeof value !== 'boolean') {
-					errors.push({
-						field: fieldName,
-						message: 'Must be a boolean'
-					})
-				}
-				break
-
-			case 'ref':
-				if (typeof value !== 'string') {
-					errors.push({
-						field: fieldName,
-						message: 'Reference must be a string (rkey)'
-					})
-				}
-				break
-
-			case 'array':
-				if (!Array.isArray(value)) {
-					errors.push({
-						field: fieldName,
-						message: 'Must be an array'
-					})
-				} else {
-					const arrayConfig = config as ArrayConfig
-					// Validate each item
-					value.forEach((item, index) => {
-						const itemValidation = validate({item: arrayConfig.items}, {item})
-						itemValidation.errors.forEach((err) => {
-							errors.push({
-								field: `${fieldName}[${index}]`,
-								message: err.message
-							})
-						})
-					})
-				}
-				break
+		if (fieldBuilder._type === 'array') {
+			if (!Array.isArray(value)) {
+				errors.push({field: fieldName, message: 'Must be an array'})
+			} else {
+				const arrayConfig = fieldBuilder._config as ArrayConfig
+				value.forEach((item, i) => {
+					const itemErrors = validate({item: arrayConfig.items}, {item})
+					itemErrors.errors.forEach((e) =>
+						errors.push({field: `${fieldName}[${i}]`, message: e.message})
+					)
+				})
+			}
+		} else {
+			const check = typeChecks[fieldBuilder._type]
+			const msg = check?.(value)
+			if (msg) errors.push({field: fieldName, message: msg})
 		}
 	}
 
-	return {
-		valid: errors.length === 0,
-		errors
-	}
+	return {valid: errors.length === 0, errors}
 }
 
 /**
@@ -271,20 +181,15 @@ function fieldBuilderToSchemaField(name: string, builder: FieldBuilder<unknown>)
 // CLAYPROTO CLASS
 // ============================================================================
 
-/**
- * High-level ClayProto SDK
- */
 export class ClayProto {
-	private registry: SchemaRegistry = new SchemaRegistry()
-	private itemCache: Map<string, Map<string, unknown>> = new Map()
+	private registry = new SchemaRegistry()
+	private itemCache = new Map<string, Map<string, unknown>>()
 
-	constructor() {
-		// Uses the global clayprotoSDK singleton
+	private cache(schema: string) {
+		if (!this.itemCache.has(schema)) this.itemCache.set(schema, new Map())
+		return this.itemCache.get(schema)!
 	}
 
-	/**
-	 * Get the user's DID
-	 */
 	get did() {
 		return clayprotoSDK.did
 	}
@@ -325,31 +230,18 @@ export class ClayProto {
 	 * Load existing schemas from PDS
 	 */
 	async loadSchemas() {
-		const schemas = await clayprotoSDK.listSchemas()
+		const fieldBuilders: Record<string, (required?: boolean) => FieldBuilder<unknown>> = {
+			string: (r) => string({required: r}),
+			number: (r) => number({required: r}),
+			boolean: (r) => boolean({required: r}),
+			array: (r) => array(string(), {required: r})
+		}
 
-		for (const {rkey, schema} of schemas) {
-			// Convert SchemaDefinition back to SchemaBuilder
+		for (const {rkey, schema} of await clayprotoSDK.listSchemas()) {
 			const builder: SchemaBuilder = {}
-
-			for (const field of schema.fields) {
-				switch (field.type) {
-					case 'string':
-						builder[field.name] = string({required: field.required})
-						break
-					case 'number':
-						builder[field.name] = number({required: field.required})
-						break
-					case 'boolean':
-						builder[field.name] = boolean({required: field.required})
-						break
-					case 'array':
-						// Simplified array handling - could be enhanced
-						builder[field.name] = array(string(), {required: field.required})
-						break
-				}
+			for (const f of schema.fields) {
+				builder[f.name] = fieldBuilders[f.type]?.(f.required) ?? string({required: f.required})
 			}
-
-			// Extract schema name from NSID (clay.user.{name})
 			const name = schema.nsid.split('.').pop() || schema.title.toLowerCase()
 			this.registry.register(name, builder, rkey)
 		}
@@ -387,12 +279,7 @@ export class ClayProto {
 			finalData as Record<string, unknown>
 		)
 
-		// Update cache
-		if (!this.itemCache.has(schemaName)) {
-			this.itemCache.set(schemaName, new Map())
-		}
-		this.itemCache.get(schemaName)!.set(rkey, {...record.data, _rkey: rkey})
-
+		this.cache(schemaName).set(rkey, {...record.data, _rkey: rkey})
 		return {rkey, data: finalData as InferSchemaType<S>}
 	}
 
@@ -404,39 +291,23 @@ export class ClayProto {
 		rkey: string,
 		options: {include?: Record<string, boolean>} = {}
 	): Promise<(InferSchemaType<S> & {_rkey: string}) | null> {
-		// Check cache first
-		const cached = this.itemCache.get(schemaName)?.get(rkey) as Record<string, unknown> | undefined
-		if (cached) {
-			return (await this.resolveRelations(
-				schemaName,
-				cached,
-				options.include
-			)) as InferSchemaType<S> & {
-				_rkey: string
+		let data = this.cache(schemaName).get(rkey) as Record<string, unknown> | undefined
+
+		if (!data) {
+			try {
+				const item = await clayprotoSDK.getItem(rkey)
+				data = {...item.data, _rkey: rkey}
+				this.cache(schemaName).set(rkey, data)
+			} catch {
+				return null
 			}
 		}
 
-		// Fetch from PDS
-		try {
-			const item = await clayprotoSDK.getItem(rkey)
-			const data = {...item.data, _rkey: rkey}
-
-			// Update cache
-			if (!this.itemCache.has(schemaName)) {
-				this.itemCache.set(schemaName, new Map())
-			}
-			this.itemCache.get(schemaName)!.set(rkey, data)
-
-			return (await this.resolveRelations(
-				schemaName,
-				data,
-				options.include
-			)) as InferSchemaType<S> & {
-				_rkey: string
-			}
-		} catch {
-			return null
-		}
+		return (await this.resolveRelations(
+			schemaName,
+			data,
+			options.include
+		)) as InferSchemaType<S> & {_rkey: string}
 	}
 
 	/**
@@ -515,11 +386,10 @@ export class ClayProto {
 			throw new Error(`Item not found: ${rkey}`)
 		}
 
-		// Merge with updates
-		const updated = {...existing, ...data}
-
-		// Remove internal fields
-		const {_rkey: _, ...updateData} = updated
+		// Merge with updates, stripping _rkey which was added during retrieval
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const {_rkey, ...existingData} = existing
+		const updateData = {...existingData, ...data}
 
 		// Validate
 		const validation = validate(schema.builder, updateData as Record<string, unknown>)
@@ -534,20 +404,13 @@ export class ClayProto {
 			updateData as Record<string, unknown>
 		)
 
-		// Update cache
-		this.itemCache.get(schemaName)?.set(rkey, {...updateData, _rkey: rkey})
-
+		this.cache(schemaName).set(rkey, {...updateData, _rkey: rkey})
 		return updateData as InferSchemaType<S>
 	}
 
-	/**
-	 * Delete an item
-	 */
 	async delete(schemaName: string, rkey: string): Promise<void> {
 		await clayprotoSDK.deleteItem(rkey)
-
-		// Remove from cache
-		this.itemCache.get(schemaName)?.delete(rkey)
+		this.cache(schemaName).delete(rkey)
 	}
 
 	/**

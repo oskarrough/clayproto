@@ -11,56 +11,19 @@
 	let {fields, values = {}, errors = [], submitLabel = 'Submit'}: Props = $props()
 
 	const uid = $props.id()
+	const defaults: Record<string, unknown> = {boolean: false, array: [], string: '', number: ''}
 
-	let formData = $state<Record<string, unknown>>({})
+	let formData = $derived(
+		Object.fromEntries(fields.map((f) => [f.name, values[f.name] ?? defaults[f.type] ?? '']))
+	)
 
-	// Initialize form data with provided values once
-	$effect(() => {
-		const initial: Record<string, unknown> = {...values}
+	const getFieldError = (name: string) => errors.find((e) => e.field === name)?.message
 
-		// Apply defaults for fields
-		for (const field of fields) {
-			if (initial[field.name] === undefined) {
-				if (field.type === 'boolean') {
-					initial[field.name] = false
-				} else if (field.type === 'array') {
-					initial[field.name] = []
-				} else {
-					initial[field.name] = ''
-				}
-			}
-		}
-
-		formData = initial
-	})
-
-	function getFieldError(fieldName: string) {
-		return errors.find((e) => e.field === fieldName)?.message
+	function updateArray(name: string, fn: (arr: unknown[]) => unknown[]) {
+		const arr = Array.isArray(formData[name]) ? (formData[name] as unknown[]) : []
+		formData[name] = fn(arr)
 	}
 
-	function addArrayItem(fieldName: string) {
-		if (!Array.isArray(formData[fieldName])) {
-			formData[fieldName] = []
-		}
-		formData[fieldName] = [...(formData[fieldName] as unknown[]), '']
-	}
-
-	function removeArrayItem(fieldName: string, index: number) {
-		if (Array.isArray(formData[fieldName])) {
-			const arr = formData[fieldName] as unknown[]
-			formData[fieldName] = arr.filter((_, i) => i !== index)
-		}
-	}
-
-	function updateArrayItem(fieldName: string, index: number, value: unknown) {
-		if (Array.isArray(formData[fieldName])) {
-			const arr = [...(formData[fieldName] as unknown[])]
-			arr[index] = value
-			formData[fieldName] = arr
-		}
-	}
-
-	// Export formData so parent can access it
 	export {formData}
 </script>
 
@@ -99,12 +62,16 @@
 						<input
 							type="text"
 							value={item}
-							oninput={(e) => updateArrayItem(field.name, i, (e.target as HTMLInputElement).value)}
+							oninput={(e) =>
+								updateArray(field.name, (arr) => arr.with(i, (e.target as HTMLInputElement).value))}
 						/>
-						<button type="button" onclick={() => removeArrayItem(field.name, i)}>Remove</button>
+						<button
+							type="button"
+							onclick={() => updateArray(field.name, (arr) => arr.toSpliced(i, 1))}>Remove</button
+						>
 					</div>
 				{/each}
-				<button type="button" onclick={() => addArrayItem(field.name)}>
+				<button type="button" onclick={() => updateArray(field.name, (arr) => [...arr, ''])}>
 					Add {field.name}
 				</button>
 			</div>

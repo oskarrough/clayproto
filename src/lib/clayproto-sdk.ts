@@ -4,6 +4,7 @@ import {atprotoOAuth} from './atproto-oauth'
 
 const schemaCollection = 'app.clayproto.schema'
 const itemCollection = 'app.clayproto.item'
+const publicAgent = new Agent({service: 'https://public.api.bsky.app'})
 
 export interface SchemaField {
 	name: string
@@ -28,22 +29,19 @@ export interface ItemData {
 	createdAt: string
 }
 
-function getAgent(): Agent {
-	if (!atprotoOAuth.agent) {
-		throw new Error('Not authenticated')
-	}
+const getAgent = () => {
+	if (!atprotoOAuth.agent) throw new Error('Not authenticated')
 	return atprotoOAuth.agent
 }
 
-function getDid(): string {
-	if (!atprotoOAuth.session?.did) {
-		throw new Error('Not authenticated')
-	}
+const getDid = () => {
+	if (!atprotoOAuth.session?.did) throw new Error('Not authenticated')
 	return atprotoOAuth.session.did
 }
 
-// Public agent for reading others' data
-const publicAgent = new Agent({service: 'https://public.api.bsky.app'})
+const agentFor = (did?: string) => (did ? publicAgent : getAgent())
+const didFor = (did?: string) => did || getDid()
+const extractRkey = (uri: string) => uri.split('/').pop()!
 
 export const clayprotoSDK = {
 	get did() {
@@ -56,78 +54,57 @@ export const clayprotoSDK = {
 
 	// Schema CRUD
 	async createSchema(schema: Omit<SchemaDefinition, '$type' | 'createdAt'>) {
-		const agent = getAgent()
 		const record: SchemaDefinition = {
 			$type: schemaCollection,
-			nsid: schema.nsid,
-			title: schema.title,
-			description: schema.description,
-			fields: schema.fields,
+			...schema,
 			createdAt: new Date().toISOString()
 		}
-
-		const response = await agent.com.atproto.repo.putRecord({
+		const response = await getAgent().com.atproto.repo.putRecord({
 			repo: getDid(),
 			collection: schemaCollection,
 			rkey: TID.nextStr(),
 			record: record as unknown as Record<string, unknown>
 		})
-
-		return {rkey: response.data.uri.split('/').pop()!, record}
+		return {rkey: extractRkey(response.data.uri), record}
 	},
 
 	async getSchema(rkey: string, did?: string) {
-		const targetDid = did || getDid()
-		const agent = did ? publicAgent : getAgent()
-
-		const response = await agent.com.atproto.repo.getRecord({
-			repo: targetDid,
+		const response = await agentFor(did).com.atproto.repo.getRecord({
+			repo: didFor(did),
 			collection: schemaCollection,
 			rkey
 		})
-
 		return response.data.value as unknown as SchemaDefinition
 	},
 
 	async listSchemas(did?: string) {
-		const targetDid = did || getDid()
-		const agent = did ? publicAgent : getAgent()
-
-		const response = await agent.com.atproto.repo.listRecords({
-			repo: targetDid,
+		const response = await agentFor(did).com.atproto.repo.listRecords({
+			repo: didFor(did),
 			collection: schemaCollection
 		})
-
-		return response.data.records.map((record) => ({
-			rkey: record.uri.split('/').pop()!,
-			schema: record.value as unknown as SchemaDefinition
+		return response.data.records.map((r) => ({
+			rkey: extractRkey(r.uri),
+			schema: r.value as unknown as SchemaDefinition
 		}))
 	},
 
 	async updateSchema(rkey: string, schema: Omit<SchemaDefinition, '$type' | 'createdAt'>) {
-		const agent = getAgent()
 		const record: SchemaDefinition = {
 			$type: schemaCollection,
-			nsid: schema.nsid,
-			title: schema.title,
-			description: schema.description,
-			fields: schema.fields,
+			...schema,
 			createdAt: new Date().toISOString()
 		}
-
-		await agent.com.atproto.repo.putRecord({
+		await getAgent().com.atproto.repo.putRecord({
 			repo: getDid(),
 			collection: schemaCollection,
 			rkey,
 			record: record as unknown as Record<string, unknown>
 		})
-
 		return {rkey, record}
 	},
 
 	async deleteSchema(rkey: string) {
-		const agent = getAgent()
-		await agent.com.atproto.repo.deleteRecord({
+		await getAgent().com.atproto.repo.deleteRecord({
 			repo: getDid(),
 			collection: schemaCollection,
 			rkey
@@ -136,79 +113,64 @@ export const clayprotoSDK = {
 
 	// Item CRUD
 	async createItem(schemaType: string, data: Record<string, unknown>) {
-		const agent = getAgent()
 		const record: ItemData = {
 			$type: itemCollection,
 			schemaType,
 			data,
 			createdAt: new Date().toISOString()
 		}
-
-		const response = await agent.com.atproto.repo.putRecord({
+		const response = await getAgent().com.atproto.repo.putRecord({
 			repo: getDid(),
 			collection: itemCollection,
 			rkey: TID.nextStr(),
 			record: record as unknown as Record<string, unknown>
 		})
-
-		return {rkey: response.data.uri.split('/').pop()!, record}
+		return {rkey: extractRkey(response.data.uri), record}
 	},
 
 	async getItem(rkey: string, did?: string) {
-		const targetDid = did || getDid()
-		const agent = did ? publicAgent : getAgent()
-
-		const response = await agent.com.atproto.repo.getRecord({
-			repo: targetDid,
+		const response = await agentFor(did).com.atproto.repo.getRecord({
+			repo: didFor(did),
 			collection: itemCollection,
 			rkey
 		})
-
 		return response.data.value as unknown as ItemData
 	},
 
 	async listItems(did?: string) {
-		const targetDid = did || getDid()
-		const agent = did ? publicAgent : getAgent()
-
-		const response = await agent.com.atproto.repo.listRecords({
-			repo: targetDid,
+		const response = await agentFor(did).com.atproto.repo.listRecords({
+			repo: didFor(did),
 			collection: itemCollection
 		})
-
-		return response.data.records.map((record) => ({
-			rkey: record.uri.split('/').pop()!,
-			item: record.value as unknown as ItemData
+		return response.data.records.map((r) => ({
+			rkey: extractRkey(r.uri),
+			item: r.value as unknown as ItemData
 		}))
 	},
 
 	async listItemsBySchema(schemaType: string, did?: string) {
 		const items = await this.listItems(did)
-		return items.filter((item) => item.item.schemaType === schemaType)
+		return items.filter((i) => i.item.schemaType === schemaType)
 	},
 
 	async updateItem(rkey: string, schemaType: string, data: Record<string, unknown>) {
-		const agent = getAgent()
 		const record: ItemData = {
 			$type: itemCollection,
 			schemaType,
 			data,
 			createdAt: new Date().toISOString()
 		}
-
-		await agent.com.atproto.repo.putRecord({
+		await getAgent().com.atproto.repo.putRecord({
 			repo: getDid(),
 			collection: itemCollection,
 			rkey,
 			record: record as unknown as Record<string, unknown>
 		})
-
 		return {rkey, record}
 	},
 
 	async deleteItem(rkey: string) {
-		const agent = getAgent()
-		await agent.com.atproto.repo.deleteRecord({
+		await getAgent().com.atproto.repo.deleteRecord({
 			repo: getDid(),
 			collection: itemCollection,
 			rkey
