@@ -3,12 +3,14 @@
 	import {goto} from '$app/navigation'
 	import {page} from '$app/stores'
 	import {session} from '$lib/session'
-	import {clayprotoSDK, type SchemaDefinition} from '$lib/clayproto-sdk'
+	import {clayprotoSDK, type SchemaDefinition, type ItemData} from '$lib/clayproto-sdk'
 	import DynamicForm from '$lib/components/dynamic-form.svelte'
 
 	let schema = $state<SchemaDefinition | null>(null)
+	let item = $state<ItemData | null>(null)
 	let loading = $state(true)
 	let submitting = $state(false)
+	let deleting = $state(false)
 	let error = $state('')
 
 	let dynamicForm = $state<{formData: Record<string, unknown>} | undefined>()
@@ -22,11 +24,12 @@
 	onMount(async () => {
 		if (!$session) return
 
-		const rkey = $page.params.rkey
-		if (!rkey) return
+		const {rkey, itemRkey} = $page.params
+		if (!rkey || !itemRkey) return
 
 		try {
 			schema = await clayprotoSDK.getSchema(rkey)
+			item = await clayprotoSDK.getItem(itemRkey)
 		} catch (err) {
 			error = (err as Error).message
 		} finally {
@@ -36,17 +39,32 @@
 
 	async function handleSubmit(e: SubmitEvent) {
 		e.preventDefault()
-		if (!schema || !dynamicForm?.formData) return
+		const {rkey, itemRkey} = $page.params
+		if (!rkey || !itemRkey || !schema || !item || !dynamicForm?.formData) return
 
 		error = ''
 		submitting = true
 
 		try {
-			await clayprotoSDK.createItem(schema.name, dynamicForm.formData)
-			goto(`/schemas/${$page.params.rkey}`)
+			await clayprotoSDK.updateItem(itemRkey, schema.name, dynamicForm.formData)
+			goto(`/schemas/${rkey}`)
 		} catch (err) {
 			error = (err as Error).message
 			submitting = false
+		}
+	}
+
+	async function handleDelete() {
+		const {rkey, itemRkey} = $page.params
+		if (!rkey || !itemRkey || !confirm('Delete this item? This cannot be undone.')) return
+
+		deleting = true
+		try {
+			await clayprotoSDK.deleteItem(itemRkey)
+			goto(`/schemas/${rkey}`)
+		} catch (err) {
+			error = (err as Error).message
+			deleting = false
 		}
 	}
 </script>
@@ -62,12 +80,21 @@
 					<p><em>loading...</em></p>
 				{:else if error && !schema}
 					<p><strong>! {error}</strong></p>
-				{:else if schema}
+				{:else if schema && item}
 					<p>└─ <a href="/schemas/{$page.params.rkey}">{schema.name}/</a></p>
 					<main>
 						<p>└─ items/</p>
 						<main>
-							<p>└─ + new item/</p>
+							<p>
+								└─ {schema.fields
+									.slice(0, 2)
+									.map((f) => item.data[f.name])
+									.filter(Boolean)
+									.join(' ') || $page.params.itemRkey}/
+								<button data-text onclick={handleDelete} disabled={deleting}
+									>{#if deleting}<em>deleting...</em>{:else}delete{/if}</button
+								>
+							</p>
 							<main>
 								{#if error}
 									<p><strong>! {error}</strong></p>
@@ -76,7 +103,8 @@
 									<DynamicForm
 										bind:this={dynamicForm}
 										fields={schema.fields}
-										submitLabel={submitting ? 'creating...' : 'create'}
+										values={item.data}
+										submitLabel={submitting ? 'saving...' : 'save'}
 									/>
 								</form>
 							</main>

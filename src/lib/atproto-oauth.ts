@@ -95,12 +95,15 @@ class AtprotoOAuthService {
 
 export const atprotoOAuth = new AtprotoOAuthService()
 
-// Scopes for clayproto - identity + schema CRUD
+// Scopes for clayproto - identity + schema/item CRUD
 const scopes = [
 	'atproto',
 	'repo:app.clayproto.schema?action=create',
 	'repo:app.clayproto.schema?action=update',
-	'repo:app.clayproto.schema?action=delete'
+	'repo:app.clayproto.schema?action=delete',
+	'repo:app.clayproto.item?action=create',
+	'repo:app.clayproto.item?action=update',
+	'repo:app.clayproto.item?action=delete'
 ].join(' ')
 
 // Helper to build client ID for dev vs prod

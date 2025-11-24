@@ -22,6 +22,35 @@ You MUST use this tool whenever writing Svelte code before sending it to the use
 Generates a Svelte Playground link with the provided code.
 After completing the code, ask the user if they want a playground link. Only call this tool after user confirmation and NEVER if code was written to files in their project.
 
+## UI Principles
+
+Everything is a node (Unix philosophy: everything is a file).
+
+- Navigation = `cd`, each page shows `ls` of current directory with ancestors expanded
+- Directories end with `/`
+- `+ new` is like `touch` or `mkdir`
+- The handle is the root of their PDS - that's literally what it is
+
+Tree structure:
+
+```
+/clayproto
+├── @handle.bsky.social
+│   ├── schemas/
+│   │   └── my-schema/
+│   │       ├── fields/
+│   │       │   └── title <em>string, required</em>
+│   │       └── items/
+│   └── logout
+└── login (when signed out)
+```
+
+Text emphasis:
+
+- `<em>` - secondary info: types, metadata, empty states, loading
+- `<strong>` - errors only
+- Everything else is plain text
+
 ## Workflow Preferences
 
 - Use `jj` for version control (not git)

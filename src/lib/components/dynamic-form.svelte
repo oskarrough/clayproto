@@ -27,13 +27,10 @@
 	export {formData}
 </script>
 
-{#each fields as field (field.name)}
-	<div>
-		<label for="{uid}-{field.name}">
-			{field.name}
-			{#if field.required}<abbr title="required">*</abbr>{/if}
-		</label>
-
+{#each fields as field, i (field.name)}
+	<p>
+		{i === fields.length - 1 && !submitLabel ? '└─' : '├─'}
+		{field.name}{#if field.required}*{/if}:
 		{#if field.type === 'string'}
 			<input
 				type="text"
@@ -56,33 +53,42 @@
 				onchange={(e) => (formData[field.name] = (e.target as HTMLInputElement).checked)}
 			/>
 		{:else if field.type === 'array'}
-			<div id="{uid}-{field.name}">
-				{#each (formData[field.name] as unknown[]) || [] as item, i (i)}
-					<div>
-						<input
-							type="text"
-							value={item}
-							oninput={(e) =>
-								updateArray(field.name, (arr) => arr.with(i, (e.target as HTMLInputElement).value))}
-						/>
-						<button
-							type="button"
-							onclick={() => updateArray(field.name, (arr) => arr.toSpliced(i, 1))}>Remove</button
-						>
-					</div>
-				{/each}
-				<button type="button" onclick={() => updateArray(field.name, (arr) => [...arr, ''])}>
-					Add {field.name}
-				</button>
-			</div>
+			<em>{field.items || 'items'}</em>
 		{/if}
-
 		{#if getFieldError(field.name)}
-			<p>{getFieldError(field.name)}</p>
+			<strong>! {getFieldError(field.name)}</strong>
 		{/if}
-	</div>
+	</p>
+	{#if field.type === 'array'}
+		<main>
+			{#each (formData[field.name] as unknown[]) || [] as item, j (j)}
+				<p>
+					├─ <input
+						type="text"
+						value={item}
+						oninput={(e) =>
+							updateArray(field.name, (arr) => arr.with(j, (e.target as HTMLInputElement).value))}
+					/>
+					<button
+						data-text
+						type="button"
+						onclick={() => updateArray(field.name, (arr) => arr.toSpliced(j, 1))}>x</button
+					>
+				</p>
+			{/each}
+			<p>
+				└─ <button
+					data-text
+					type="button"
+					onclick={() => updateArray(field.name, (arr) => [...arr, ''])}
+				>
+					+ add
+				</button>
+			</p>
+		</main>
+	{/if}
 {/each}
 
-<div>
-	<button type="submit">{submitLabel}</button>
-</div>
+{#if submitLabel}
+	<p>└─ <button type="submit">{submitLabel}</button></p>
+{/if}

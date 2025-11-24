@@ -209,8 +209,7 @@ export class ClayProto {
 			)
 
 			const schemaDefinition = {
-				nsid: `clay.user.${name}`,
-				title: name.charAt(0).toUpperCase() + name.slice(1),
+				name,
 				description: `Schema for ${name}`,
 				fields
 			}
@@ -242,8 +241,7 @@ export class ClayProto {
 			for (const f of schema.fields) {
 				builder[f.name] = fieldBuilders[f.type]?.(f.required) ?? string({required: f.required})
 			}
-			const name = schema.nsid.split('.').pop() || schema.title.toLowerCase()
-			this.registry.register(name, builder, rkey)
+			this.registry.register(schema.name, builder, rkey)
 		}
 	}
 
@@ -275,7 +273,7 @@ export class ClayProto {
 
 		// Create in PDS
 		const {rkey, record} = await clayprotoSDK.createItem(
-			`clay.user.${schemaName}`,
+			schemaName,
 			finalData as Record<string, unknown>
 		)
 
@@ -325,9 +323,9 @@ export class ClayProto {
 		// Fetch all items from PDS
 		const items = await clayprotoSDK.listItems()
 
-		// Filter by schema type
+		// Filter by schema
 		let results: Record<string, unknown>[] = items
-			.filter((item) => item.item.schemaType === `clay.user.${schemaName}`)
+			.filter((item) => item.item.schema === schemaName)
 			.map((item) => ({...item.item.data, _rkey: item.rkey}))
 
 		// Apply where clause
@@ -398,11 +396,7 @@ export class ClayProto {
 		}
 
 		// Update in PDS
-		await clayprotoSDK.updateItem(
-			rkey,
-			`clay.user.${schemaName}`,
-			updateData as Record<string, unknown>
-		)
+		await clayprotoSDK.updateItem(rkey, schemaName, updateData as Record<string, unknown>)
 
 		this.cache(schemaName).set(rkey, {...updateData, _rkey: rkey})
 		return updateData as InferSchemaType<S>

@@ -4,6 +4,7 @@
 	import favicon from '$lib/assets/favicon.svg'
 	import {atprotoOAuth, buildClientId} from '$lib/atproto-oauth'
 	import {refreshSession} from '$lib/session'
+	import './style.css'
 
 	let {children} = $props()
 	let ready = $state(false)
@@ -34,8 +35,16 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-{#if ready}
-	{@render children()}
-{:else}
-	<p>Loading...</p>
-{/if}
+<main>
+	{#if ready}
+		{@render children()}
+	{:else}
+		<p>Loading...</p>
+	{/if}
+</main>
+
+<style>
+	main {
+		margin: 1rem;
+	}
+</style>

@@ -5,8 +5,9 @@
 	import {session} from '$lib/session'
 	import {clayprotoSDK, type SchemaField} from '$lib/clayproto-sdk'
 
-	let nsid = $state('')
-	let title = $state('')
+	const uid = $props.id()
+
+	let name = $state('')
 	let description = $state('')
 	let fields = $state<SchemaField[]>([])
 	let loading = $state(true)
@@ -25,8 +26,7 @@
 
 		try {
 			const schema = await clayprotoSDK.getSchema(rkey)
-			nsid = schema.nsid
-			title = schema.title
+			name = schema.name
 			description = schema.description || ''
 			fields = schema.fields
 		} catch (err) {
@@ -47,15 +47,14 @@
 	async function handleSubmit(e: SubmitEvent) {
 		e.preventDefault()
 		const {rkey} = $page.params
-		if (!rkey || !nsid || !title) return
+		if (!rkey || !name) return
 
 		error = ''
 		submitting = true
 
 		try {
 			await clayprotoSDK.updateSchema(rkey, {
-				nsid,
-				title,
+				name,
 				description: description || undefined,
 				fields
 			})
@@ -67,84 +66,99 @@
 	}
 </script>
 
-{#if loading}
-	<p>Loading...</p>
-{:else}
-	<h1>Edit Schema</h1>
-
-	{#if error}
-		<p style="color: red">{error}</p>
-	{/if}
-
-	<form onsubmit={handleSubmit}>
-		<div>
-			<label for="nsid">NSID</label>
-			<input
-				type="text"
-				id="nsid"
-				bind:value={nsid}
-				placeholder="clay.music.track"
-				disabled={submitting}
-				required
-			/>
-			<small>Namespace identifier (e.g., clay.username.typename)</small>
-		</div>
-
-		<div>
-			<label for="title">Title</label>
-			<input type="text" id="title" bind:value={title} disabled={submitting} required />
-		</div>
-
-		<div>
-			<label for="description">Description</label>
-			<textarea id="description" bind:value={description} disabled={submitting}></textarea>
-		</div>
-
-		<h2>Fields</h2>
-
-		{#each fields as field, i (i)}
-			<div class="field-row">
-				<input
-					type="text"
-					bind:value={field.name}
-					placeholder="Field name"
-					disabled={submitting}
-					required
-				/>
-
-				<select bind:value={field.type} disabled={submitting} required>
-					<option value="string">String</option>
-					<option value="number">Number</option>
-					<option value="boolean">Boolean</option>
-					<option value="array">Array</option>
-				</select>
-
-				{#if field.type === 'array'}
-					<input
-						type="text"
-						bind:value={field.items}
-						placeholder="Item type"
-						disabled={submitting}
-					/>
+<main>
+	<p><a href="/">clayproto/</a></p>
+	<main>
+		<p>@{$session?.handle}/</p>
+		<main>
+			<p>└─ <a href="/schemas">schemas/</a></p>
+			<main>
+				{#if loading}
+					<p><em>loading...</em></p>
+				{:else}
+					<p>└─ <a href="/schemas/{$page.params.rkey}">{name || '...'}/</a></p>
+					<main>
+						<p>└─ edit/</p>
+						<main>
+							{#if error}
+								<p><strong>! {error}</strong></p>
+							{/if}
+							<form onsubmit={handleSubmit}>
+								<p>
+									├─ name: <input
+										type="text"
+										id="{uid}-name"
+										bind:value={name}
+										placeholder="track"
+										disabled={submitting}
+										required
+									/>
+								</p>
+								<p>
+									├─ description: <textarea
+										id="{uid}-description"
+										bind:value={description}
+										disabled={submitting}
+									></textarea>
+								</p>
+								<p>├─ fields/</p>
+								<main>
+									{#each fields as field, i (i)}
+										<p>
+											├─ <input
+												type="text"
+												bind:value={field.name}
+												placeholder="name"
+												disabled={submitting}
+												required
+											/>
+											<em>
+												<select bind:value={field.type} disabled={submitting} required>
+													<option value="string">string</option>
+													<option value="number">number</option>
+													<option value="boolean">boolean</option>
+													<option value="array">array</option>
+												</select>
+												{#if field.type === 'array'}
+													<input
+														type="text"
+														bind:value={field.items}
+														placeholder="item type"
+														disabled={submitting}
+													/>
+												{/if}
+											</em>
+											<label
+												><input
+													type="checkbox"
+													bind:checked={field.required}
+													disabled={submitting}
+												/> *</label
+											>
+											<button
+												data-text
+												type="button"
+												onclick={() => removeField(i)}
+												disabled={submitting}>x</button
+											>
+										</p>
+									{/each}
+									<p>
+										└─ <button data-text type="button" onclick={addField} disabled={submitting}
+											>+ add field</button
+										>
+									</p>
+								</main>
+								<p>
+									└─ <button type="submit" disabled={submitting}>
+										{#if submitting}<em>saving...</em>{:else}save{/if}
+									</button>
+								</p>
+							</form>
+						</main>
+					</main>
 				{/if}
-
-				<label>
-					<input type="checkbox" bind:checked={field.required} disabled={submitting} />
-					Required
-				</label>
-
-				<button type="button" onclick={() => removeField(i)} disabled={submitting}>Remove</button>
-			</div>
-		{/each}
-
-		<button type="button" onclick={addField} disabled={submitting}>Add Field</button>
-
-		<div>
-			<button type="submit" disabled={submitting}>
-				{submitting ? 'Saving...' : 'Save Schema'}
-			</button>
-		</div>
-	</form>
-
-	<p><a href="/schemas/{$page.params.rkey}">← Cancel</a></p>
-{/if}
+			</main>
+		</main>
+	</main>
+</main>

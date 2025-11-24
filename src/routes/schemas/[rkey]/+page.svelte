@@ -38,7 +38,7 @@
 
 		try {
 			schema = await clayprotoSDK.getSchema(rkey)
-			items = await clayprotoSDK.listItemsBySchema(schema.nsid)
+			items = await clayprotoSDK.listItemsBySchema(schema.name)
 		} catch (err) {
 			error = (err as Error).message
 		} finally {
@@ -47,63 +47,69 @@
 	})
 </script>
 
-{#if loading}
-	<p>Loading...</p>
-{:else if error}
-	<p style="color: red">{error}</p>
-{:else if schema}
-	<h1>{schema.title}</h1>
-	<p><code>{schema.nsid}</code></p>
-
-	<p>
-		<a href="/schemas/{$page.params.rkey}/edit">Edit</a>
-		<button onclick={handleDelete} disabled={deleting}>
-			{deleting ? 'Deleting...' : 'Delete'}
-		</button>
-	</p>
-
-	{#if schema.description}
-		<p>{schema.description}</p>
-	{/if}
-
-	<h2>Fields</h2>
-	<table>
-		<thead>
-			<tr>
-				<th>Name</th>
-				<th>Type</th>
-				<th>Required</th>
-			</tr>
-		</thead>
-		<tbody>
-			{#each schema.fields as field (field.name)}
-				<tr>
-					<td>{field.name}</td>
-					<td>{field.type}{field.items ? `<${field.items}>` : ''}</td>
-					<td>{field.required ? 'Yes' : 'No'}</td>
-				</tr>
-			{/each}
-		</tbody>
-	</table>
-
-	<h2>Items</h2>
-	<p><a href="/schemas/{$page.params.rkey}/new">+ New Item</a></p>
-
-	{#if items.length === 0}
-		<p>No items yet.</p>
-	{:else}
-		<ul>
-			{#each items as { rkey, item } (rkey)}
-				<li>
-					{#each schema.fields.slice(0, 2) as field (field.name)}
-						{#if item.data[field.name]}
-							<span>{item.data[field.name]}</span>
+<main>
+	<p><a href="/">clayproto/</a></p>
+	<main>
+		<p>@{$session?.handle}/</p>
+		<main>
+			<p>└─ <a href="/schemas">schemas/</a></p>
+			<main>
+				{#if loading}
+					<p><em>loading...</em></p>
+				{:else if error}
+					<p><strong>! {error}</strong></p>
+				{:else if schema}
+					<p>
+						└─ {schema.name}/ <a href="/schemas/{$page.params.rkey}/edit">edit</a>
+						<button data-text onclick={handleDelete} disabled={deleting}
+							>{#if deleting}<em>deleting...</em>{:else}delete{/if}</button
+						>
+						{#if schema.description}<em>{schema.description}</em>{/if}
+					</p>
+					<main>
+						<p>
+							├─ fields/{#if schema.fields.length > 0}
+								({schema.fields.length}){:else}
+								<em>(empty)</em>{/if}
+						</p>
+						{#if schema.fields.length > 0}
+							<main>
+								{#each schema.fields as field, i (field.name)}
+									<p>
+										{i === schema.fields.length - 1 ? '└─' : '├─'}
+										<strong>{field.name}</strong>
+										<em
+											>{field.type}{field.items ? `<${field.items}>` : ''}{field.required
+												? ' *'
+												: ''}</em
+										>
+									</p>
+								{/each}
+							</main>
 						{/if}
-					{/each}
-				</li>
-			{/each}
-		</ul>
-	{/if}
-{/if}
-
-<p><a href="/schemas">← Back to Schemas</a></p>
+						<p>
+							└─ items/{#if items.length > 0}
+								({items.length}){:else}
+								<em>(empty)</em>{/if}
+						</p>
+						<main>
+							{#each items as { rkey: itemRkey, item } (itemRkey)}
+								{@const preview = schema.fields
+									.slice(0, 2)
+									.map((f) => item.data[f.name])
+									.filter(Boolean)
+									.join(' ')}
+								<p>
+									├─ <a href="/schemas/{$page.params.rkey}/items/{itemRkey}/edit"
+										>{preview || itemRkey}</a
+									>
+								</p>
+							{/each}
+							<p>└─ <a href="/schemas/{$page.params.rkey}/new">+ new item</a></p>
+						</main>
+					</main>
+				{/if}
+			</main>
+		</main>
+	</main>
+</main>

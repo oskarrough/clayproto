@@ -26,29 +26,35 @@
 	}
 </script>
 
-<h1>clayproto</h1>
-<p>Malleable, manpage-style, cool, usable, FREE software</p>
-
-{#if $session}
-	<p>Logged in as: {$session.handle}</p>
-	<nav>
-		<a href="/schemas">My Schemas</a>
-	</nav>
-	<button type="button" onclick={signOut}>Logout</button>
-{:else}
-	<form onsubmit={signIn}>
-		<input
-			type="text"
-			bind:value={handle}
-			placeholder="your-handle.bsky.social"
-			disabled={signingIn}
-			required
-		/>
-		<button type="submit" disabled={signingIn}>
-			{signingIn ? 'Signing in...' : 'Sign in'}
-		</button>
-	</form>
-	{#if error}
-		<p style="color: red">{error}</p>
+<main>
+	<p>clayproto/</p>
+	{#if $session}
+		<main>
+			<p>@{$session.handle}/</p>
+			<main>
+				<p>├─ <a href="/schemas">schemas/</a></p>
+				<p>└─ <button data-text type="button" onclick={signOut}>logout</button></p>
+			</main>
+		</main>
+	{:else}
+		<main>
+			<form onsubmit={signIn}>
+				<p>
+					└─ <input
+						type="text"
+						bind:value={handle}
+						placeholder="you.bsky.social"
+						disabled={signingIn}
+						required
+					/>
+					<button type="submit" disabled={signingIn}
+						>{#if signingIn}<em>signing in...</em>{:else}sign in{/if}</button
+					>
+				</p>
+			</form>
+			{#if error}
+				<p><strong>! {error}</strong></p>
+			{/if}
+		</main>
 	{/if}
-{/if}
+</main>

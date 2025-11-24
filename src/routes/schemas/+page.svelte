@@ -24,29 +24,30 @@
 	})
 </script>
 
-<h1>Schemas</h1>
-
-{#if loading}
-	<p>Loading...</p>
-{:else if error}
-	<p style="color: red">{error}</p>
-{:else if schemas.length === 0}
-	<p>No schemas yet. <a href="/schemas/new">Create your first schema</a></p>
-{:else}
-	<p><a href="/schemas/new">Create New Schema</a></p>
-	<ul>
-		{#each schemas as { rkey, schema } (rkey)}
-			<li>
-				<a href="/schemas/{rkey}">
-					<strong>{schema.title}</strong> ({schema.nsid})
-				</a>
-				{#if schema.description}
-					<p>{schema.description}</p>
+<main>
+	<p><a href="/">clayproto/</a></p>
+	<main>
+		<p>@{$session?.handle}/</p>
+		<main>
+			<p>└─ schemas/</p>
+			<main>
+				{#if loading}
+					<p><em>loading...</em></p>
+				{:else if error}
+					<p><strong>! {error}</strong></p>
+				{:else}
+					{#if schemas.length === 0}
+						<p><em>(empty)</em></p>
+					{:else}
+						{#each schemas as { rkey, schema } (rkey)}
+							<p>
+								├─ <a href="/schemas/{rkey}">{schema.name || `(${rkey})`}/</a>
+							</p>
+						{/each}
+					{/if}
+					<p>└─ <a href="/schemas/new">+ new schema</a></p>
 				{/if}
-				<p>{schema.fields.length} fields</p>
-			</li>
-		{/each}
-	</ul>
-{/if}
-
-<p><a href="/">← Home</a></p>
+			</main>
+		</main>
+	</main>
+</main>

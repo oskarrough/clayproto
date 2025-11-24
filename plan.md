@@ -43,10 +43,9 @@ Minimal, malleable POC. Single routes for each purpose:
 8. ✅ Implement item CRUD operations (SDK done, routes wired)
 9. ✅ Build list/view UI for items (/schemas/[rkey] shows items)
 10. ✅ Refactor for elegance (field builder factory, cache helper, reduced LOC)
-11. Item edit/delete UI
-12. Item detail view (/schemas/[rkey]/items/[itemRkey])
-13. Test full flow end-to-end
-14. Basic styling
+11. ✅ Item edit/delete UI (edit page doubles as detail view)
+12. Test full flow end-to-end
+13. Basic styling
 
 ## OPEN QUESTIONS
 

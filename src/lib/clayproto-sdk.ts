@@ -15,8 +15,7 @@ export interface SchemaField {
 
 export interface SchemaDefinition {
 	$type: typeof schemaCollection
-	nsid: string
-	title: string
+	name: string
 	description?: string
 	fields: SchemaField[]
 	createdAt: string
@@ -24,7 +23,7 @@ export interface SchemaDefinition {
 
 export interface ItemData {
 	$type: typeof itemCollection
-	schemaType: string
+	schema: string
 	data: Record<string, unknown>
 	createdAt: string
 }
@@ -112,10 +111,10 @@ export const clayprotoSDK = {
 	},
 
 	// Item CRUD
-	async createItem(schemaType: string, data: Record<string, unknown>) {
+	async createItem(schema: string, data: Record<string, unknown>) {
 		const record: ItemData = {
 			$type: itemCollection,
-			schemaType,
+			schema,
 			data,
 			createdAt: new Date().toISOString()
 		}
@@ -148,15 +147,15 @@ export const clayprotoSDK = {
 		}))
 	},
 
-	async listItemsBySchema(schemaType: string, did?: string) {
+	async listItemsBySchema(schema: string, did?: string) {
 		const items = await this.listItems(did)
-		return items.filter((i) => i.item.schemaType === schemaType)
+		return items.filter((i) => i.item.schema === schema)
 	},
 
-	async updateItem(rkey: string, schemaType: string, data: Record<string, unknown>) {
+	async updateItem(rkey: string, schema: string, data: Record<string, unknown>) {
 		const record: ItemData = {
 			$type: itemCollection,
-			schemaType,
+			schema,
 			data,
 			createdAt: new Date().toISOString()
 		}
