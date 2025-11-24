@@ -1,6 +1,6 @@
 // See https://svelte.dev/docs/kit/types#app.d.ts
 // for information about these interfaces
-import type { OAuthSession } from '@atproto/oauth-client-node'
+import type {OAuthSession} from '@atproto/oauth-client-node'
 
 declare global {
 	namespace App {

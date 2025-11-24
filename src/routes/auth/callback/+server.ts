@@ -1,12 +1,12 @@
-import { oauthClient } from '$lib/atproto/oauth'
-import { error, redirect } from '@sveltejs/kit'
-import type { RequestHandler } from './$types'
+import {oauthClient} from '$lib/atproto-oauth'
+import {error, redirect} from '@sveltejs/kit'
+import type {RequestHandler} from './$types'
 
-export const GET: RequestHandler = async ({ url, cookies }) => {
+export const GET: RequestHandler = async ({url, cookies}) => {
 	const params = url.searchParams
 
 	try {
-		const { session } = await oauthClient.callback(params)
+		const {session} = await oauthClient.callback(params)
 		const did = session.did
 
 		// Store DID in session cookie

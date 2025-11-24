@@ -6,8 +6,8 @@
  * be executed directly with a real OAuth session.
  */
 
-import { ClayProto, clay, ValidationError } from '../src/lib/clayproto'
-import type { OAuthSession } from '@atproto/oauth-client-node'
+import {ClayProto, clay, ValidationError} from '../src/lib/clayproto'
+import type {OAuthSession} from '@atproto/oauth-client-node'
 
 // ============================================================================
 // TEST HELPERS
@@ -51,13 +51,13 @@ export async function runTests(session: OAuthSession) {
 	console.log('Test 1: Define schemas')
 	const schemas = await cp.defineSchemas({
 		testFolder: {
-			name: clay.string({ required: true }),
-			description: clay.string({ nullable: true }),
-			count: clay.number({ default: 0 })
+			name: clay.string({required: true}),
+			description: clay.string({nullable: true}),
+			count: clay.number({default: 0})
 		},
 		testFile: {
-			name: clay.string({ required: true }),
-			folder: clay.ref('testFolder', { required: true }),
+			name: clay.string({required: true}),
+			folder: clay.ref('testFolder', {required: true}),
 			tags: clay.array(clay.string())
 		}
 	})
@@ -69,21 +69,21 @@ export async function runTests(session: OAuthSession) {
 	// Test 2: Validation
 	console.log('Test 2: Validation')
 
-	const validData = { name: 'Test', count: 5 }
+	const validData = {name: 'Test', count: 5}
 	const validResult = clay.validate(
 		{
-			name: clay.string({ required: true }),
+			name: clay.string({required: true}),
 			count: clay.number()
 		},
 		validData
 	)
 	assert(validResult.valid, 'Valid data should pass validation')
 
-	const invalidData = { name: '', count: 'not a number' }
+	const invalidData = {name: '', count: 'not a number'}
 	const invalidResult = clay.validate(
 		{
-			name: clay.string({ required: true }),
-			count: clay.number({ required: true })
+			name: clay.string({required: true}),
+			count: clay.number({required: true})
 		},
 		invalidData
 	)
@@ -93,7 +93,7 @@ export async function runTests(session: OAuthSession) {
 
 	// Test 3: Create Item
 	console.log('Test 3: Create item')
-	const { rkey: folderId, data: folderData } = await cp.create('testFolder', {
+	const {rkey: folderId, data: folderData} = await cp.create('testFolder', {
 		name: 'Test Folder',
 		description: 'A test folder',
 		count: 10
@@ -113,7 +113,7 @@ export async function runTests(session: OAuthSession) {
 
 	// Test 5: Create with Reference
 	console.log('Test 5: Create with reference')
-	const { rkey: fileId } = await cp.create('testFile', {
+	const {rkey: fileId} = await cp.create('testFile', {
 		name: 'test.txt',
 		folder: folderId,
 		tags: ['test', 'example']
@@ -124,7 +124,7 @@ export async function runTests(session: OAuthSession) {
 	// Test 6: Query Items
 	console.log('Test 6: Query items')
 	const folders = await cp.query('testFolder', {
-		where: { name: 'Test Folder' }
+		where: {name: 'Test Folder'}
 	})
 	assert(folders.length > 0, 'Query should return results')
 	assert(folders[0].name === 'Test Folder', 'Query should filter correctly')
@@ -133,8 +133,8 @@ export async function runTests(session: OAuthSession) {
 	// Test 7: Query with Relations
 	console.log('Test 7: Query with relations')
 	const files = await cp.query('testFile', {
-		where: { folder: folderId },
-		include: { folder: true }
+		where: {folder: folderId},
+		include: {folder: true}
 	})
 	assert(files.length > 0, 'Should find file')
 	assert(typeof files[0].folder === 'object', 'Should resolve folder reference')
@@ -169,7 +169,7 @@ export async function runTests(session: OAuthSession) {
 	// Test 10: Ordering and Limit
 	console.log('Test 10: Ordering and limit')
 	const orderedFiles = await cp.query('testFile', {
-		orderBy: { name: 'asc' },
+		orderBy: {name: 'asc'},
 		limit: 1
 	})
 	assert(orderedFiles.length === 1, 'Limit should work')
@@ -190,7 +190,7 @@ export async function runTests(session: OAuthSession) {
 
 	// Test 12: Default Values
 	console.log('Test 12: Default values')
-	const { data: folderWithDefaults } = await cp.create('testFolder', {
+	const {data: folderWithDefaults} = await cp.create('testFolder', {
 		name: 'Folder with defaults'
 		// count should default to 0
 	})
@@ -217,7 +217,7 @@ export async function runTests(session: OAuthSession) {
 		{
 			tags: clay.array(clay.string())
 		},
-		{ tags: ['valid', 'tags'] }
+		{tags: ['valid', 'tags']}
 	)
 	assert(arrayResult.valid, 'Valid array should pass')
 
@@ -225,7 +225,7 @@ export async function runTests(session: OAuthSession) {
 		{
 			tags: clay.array(clay.string())
 		},
-		{ tags: 'not an array' }
+		{tags: 'not an array'}
 	)
 	assert(!invalidArrayResult.valid, 'Invalid array should fail')
 	console.log('✓ Array validation working\n')

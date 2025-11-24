@@ -5,8 +5,8 @@
  * a complete working application using ClayProto's elegant API.
  */
 
-import { ClayProto, clay } from '../src/lib/clayproto'
-import type { OAuthSession } from '@atproto/oauth-client-node'
+import {ClayProto, clay} from '../src/lib/clayproto'
+import type {OAuthSession} from '@atproto/oauth-client-node'
 
 // ============================================================================
 // SETUP
@@ -23,19 +23,19 @@ const cp = new ClayProto(session)
 
 const schemas = await cp.defineSchemas({
 	folder: {
-		name: clay.string({ required: true }),
-		parent: clay.ref('folder', { nullable: true }),
-		color: clay.string({ default: 'blue' }),
-		createdAt: clay.string({ required: true })
+		name: clay.string({required: true}),
+		parent: clay.ref('folder', {nullable: true}),
+		color: clay.string({default: 'blue'}),
+		createdAt: clay.string({required: true})
 	},
 
 	file: {
-		name: clay.string({ required: true }),
-		folder: clay.ref('folder', { required: true }),
-		url: clay.string({ required: true }),
-		size: clay.number({ nullable: true }),
+		name: clay.string({required: true}),
+		folder: clay.ref('folder', {required: true}),
+		url: clay.string({required: true}),
+		size: clay.number({nullable: true}),
 		tags: clay.array(clay.string()),
-		createdAt: clay.string({ required: true })
+		createdAt: clay.string({required: true})
 	}
 })
 
@@ -46,14 +46,14 @@ console.log('Schemas created:', schemas)
 // ============================================================================
 
 // Create root folders
-const { rkey: photosId } = await cp.create('folder', {
+const {rkey: photosId} = await cp.create('folder', {
 	name: 'Photos',
 	parent: null,
 	color: 'purple',
 	createdAt: new Date().toISOString()
 })
 
-const { rkey: documentsId } = await cp.create('folder', {
+const {rkey: documentsId} = await cp.create('folder', {
 	name: 'Documents',
 	parent: null,
 	color: 'blue',
@@ -61,7 +61,7 @@ const { rkey: documentsId } = await cp.create('folder', {
 })
 
 // Create subfolder
-const { rkey: vacationId } = await cp.create('folder', {
+const {rkey: vacationId} = await cp.create('folder', {
 	name: 'Vacation 2024',
 	parent: photosId,
 	color: 'orange',
@@ -102,8 +102,8 @@ await cp.create('file', {
 
 // Get all root folders
 const rootFolders = await cp.query('folder', {
-	where: { parent: null },
-	orderBy: { name: 'asc' }
+	where: {parent: null},
+	orderBy: {name: 'asc'}
 })
 
 console.log('Root folders:', rootFolders)
@@ -114,8 +114,8 @@ console.log('Root folders:', rootFolders)
 
 // Get files in vacation folder with folder relation resolved
 const vacationFiles = await cp.query('file', {
-	where: { folder: vacationId },
-	include: { folder: true }
+	where: {folder: vacationId},
+	include: {folder: true}
 })
 
 console.log('Vacation files:', vacationFiles)
@@ -178,9 +178,9 @@ const invalidData = {
 
 const result = clay.validate(
 	{
-		name: clay.string({ required: true }),
-		folder: clay.ref('folder', { required: true }),
-		url: clay.string({ required: true })
+		name: clay.string({required: true}),
+		folder: clay.ref('folder', {required: true}),
+		url: clay.string({required: true})
 	},
 	invalidData
 )
@@ -212,7 +212,7 @@ try {
 
 // Get all files, sorted by size descending
 const largeFiles = await cp.query('file', {
-	orderBy: { size: 'desc' },
+	orderBy: {size: 'desc'},
 	limit: 10
 })
 
@@ -227,7 +227,7 @@ await cp.query('file', {
 
 // Get a folder with its parent resolved
 const folderWithParent = await cp.get('folder', vacationId, {
-	include: { parent: true }
+	include: {parent: true}
 })
 
 console.log('Folder with parent:', folderWithParent)

@@ -254,9 +254,9 @@ Since Lexicons must be published and versioned, true runtime dynamic schemas are
 	"nsid": "clay.music.track",
 	"title": "Music Track",
 	"fields": [
-		{ "name": "url", "type": "string", "required": true },
-		{ "name": "title", "type": "string", "required": true },
-		{ "name": "tags", "type": "array", "items": "string" }
+		{"name": "url", "type": "string", "required": true},
+		{"name": "title", "type": "string", "required": true},
+		{"name": "tags", "type": "array", "items": "string"}
 	],
 	"createdAt": "2025-11-24T10:00:00Z"
 }

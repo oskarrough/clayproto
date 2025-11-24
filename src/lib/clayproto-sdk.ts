@@ -1,6 +1,6 @@
-import { Agent } from '@atproto/api'
-import type { OAuthSession } from '@atproto/oauth-client-node'
-import { TID } from '@atproto/common-web'
+import {Agent} from '@atproto/api'
+import type {OAuthSession} from '@atproto/oauth-client-node'
+import {TID} from '@atproto/common-web'
 
 const schemaCollection = 'app.clayproto.schema'
 const itemCollection = 'app.clayproto.item'
@@ -54,7 +54,7 @@ export class ClayprotoSDK {
 			record
 		})
 
-		return { rkey: response.data.uri.split('/').pop()!, record }
+		return {rkey: response.data.uri.split('/').pop()!, record}
 	}
 
 	async getSchema(rkey: string) {
@@ -93,7 +93,7 @@ export class ClayprotoSDK {
 			record
 		})
 
-		return { rkey, record }
+		return {rkey, record}
 	}
 
 	async deleteSchema(rkey: string) {
@@ -120,7 +120,7 @@ export class ClayprotoSDK {
 			record
 		})
 
-		return { rkey: response.data.uri.split('/').pop()!, record }
+		return {rkey: response.data.uri.split('/').pop()!, record}
 	}
 
 	async getItem(rkey: string) {
@@ -160,7 +160,7 @@ export class ClayprotoSDK {
 			record
 		})
 
-		return { rkey, record }
+		return {rkey, record}
 	}
 
 	async deleteItem(rkey: string) {

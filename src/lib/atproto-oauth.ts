@@ -1,4 +1,4 @@
-import { NodeOAuthClient } from '@atproto/oauth-client-node'
+import {NodeOAuthClient} from '@atproto/oauth-client-node'
 
 export const oauthClient = new NodeOAuthClient({
 	clientMetadata: {

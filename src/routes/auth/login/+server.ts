@@ -1,8 +1,8 @@
-import { oauthClient } from '$lib/atproto/oauth'
-import { error, redirect } from '@sveltejs/kit'
-import type { RequestHandler } from './$types'
+import {oauthClient} from '$lib/atproto-oauth'
+import {error, redirect} from '@sveltejs/kit'
+import type {RequestHandler} from './$types'
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({url}) => {
 	const handle = url.searchParams.get('handle')
 
 	if (!handle) {

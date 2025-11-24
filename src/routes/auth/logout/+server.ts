@@ -1,7 +1,7 @@
-import { redirect } from '@sveltejs/kit'
-import type { RequestHandler } from './$types'
+import {redirect} from '@sveltejs/kit'
+import type {RequestHandler} from './$types'
 
-export const GET: RequestHandler = async ({ cookies }) => {
-	cookies.delete('did', { path: '/' })
+export const GET: RequestHandler = async ({cookies}) => {
+	cookies.delete('did', {path: '/'})
 	throw redirect(302, '/')
 }

@@ -5,8 +5,8 @@
  * Wraps the low-level SDK with schema builders, validation, and relations.
  */
 
-import { ClayprotoSDK, type SchemaDefinition, type SchemaField } from '../atproto/sdk'
-import type { OAuthSession } from '@atproto/oauth-client-node'
+import {ClayprotoSDK, type SchemaField} from './clayproto-sdk'
+import type {OAuthSession} from '@atproto/oauth-client-node'
 
 // ============================================================================
 // TYPES
@@ -38,19 +38,19 @@ export type InferSchemaType<S extends SchemaBuilder> = {
 	[K in keyof S]: S[K]['_infer']
 }
 
-export interface ValidationError {
+export interface FieldValidationError {
 	field: string
 	message: string
 }
 
 export interface ValidationResult {
 	valid: boolean
-	errors: ValidationError[]
+	errors: FieldValidationError[]
 }
 
 export interface QueryOptions<T = unknown> {
 	where?: Partial<T> | ((item: T) => boolean)
-	orderBy?: { [key: string]: 'asc' | 'desc' }
+	orderBy?: {[key: string]: 'asc' | 'desc'}
 	limit?: number
 	include?: Record<string, boolean>
 }
@@ -101,7 +101,7 @@ export function ref<T = unknown>(
 ): FieldBuilder<T | null> {
 	return {
 		_type: 'ref',
-		_config: { ...config, schema },
+		_config: {...config, schema},
 		_infer: undefined as unknown as T | null
 	}
 }
@@ -115,7 +115,7 @@ export function array<T>(
 ): FieldBuilder<T[]> {
 	return {
 		_type: 'array',
-		_config: { ...config, items },
+		_config: {...config, items},
 		_infer: undefined as unknown as T[]
 	}
 }
@@ -128,10 +128,10 @@ export function array<T>(
  * Internal registry of defined schemas
  */
 class SchemaRegistry {
-	private schemas: Map<string, { builder: SchemaBuilder; rkey?: string }> = new Map()
+	private schemas: Map<string, {builder: SchemaBuilder; rkey?: string}> = new Map()
 
 	register(name: string, builder: SchemaBuilder, rkey?: string) {
-		this.schemas.set(name, { builder, rkey })
+		this.schemas.set(name, {builder, rkey})
 	}
 
 	get(name: string) {
@@ -143,7 +143,7 @@ class SchemaRegistry {
 	}
 
 	all() {
-		return Array.from(this.schemas.entries()).map(([name, { builder, rkey }]) => ({
+		return Array.from(this.schemas.entries()).map(([name, {builder, rkey}]) => ({
 			name,
 			builder,
 			rkey
@@ -162,7 +162,7 @@ export function validate<S extends SchemaBuilder>(
 	schemaBuilder: S,
 	data: Record<string, unknown>
 ): ValidationResult {
-	const errors: ValidationError[] = []
+	const errors: FieldValidationError[] = []
 
 	for (const [fieldName, fieldBuilder] of Object.entries(schemaBuilder)) {
 		const value = data[fieldName]
@@ -230,7 +230,7 @@ export function validate<S extends SchemaBuilder>(
 					const arrayConfig = config as ArrayConfig
 					// Validate each item
 					value.forEach((item, index) => {
-						const itemValidation = validate({ item: arrayConfig.items }, { item })
+						const itemValidation = validate({item: arrayConfig.items}, {item})
 						itemValidation.errors.forEach((err) => {
 							errors.push({
 								field: `${fieldName}[${index}]`,
@@ -313,7 +313,7 @@ export class ClayProto {
 			}
 
 			// Create schema in PDS
-			const { rkey } = await this.sdk.createSchema(schemaDefinition)
+			const {rkey} = await this.sdk.createSchema(schemaDefinition)
 			rkeys[name] = rkey
 
 			// Register in local registry
@@ -329,24 +329,24 @@ export class ClayProto {
 	async loadSchemas() {
 		const schemas = await this.sdk.listSchemas()
 
-		for (const { rkey, schema } of schemas) {
+		for (const {rkey, schema} of schemas) {
 			// Convert SchemaDefinition back to SchemaBuilder
 			const builder: SchemaBuilder = {}
 
 			for (const field of schema.fields) {
 				switch (field.type) {
 					case 'string':
-						builder[field.name] = string({ required: field.required })
+						builder[field.name] = string({required: field.required})
 						break
 					case 'number':
-						builder[field.name] = number({ required: field.required })
+						builder[field.name] = number({required: field.required})
 						break
 					case 'boolean':
-						builder[field.name] = boolean({ required: field.required })
+						builder[field.name] = boolean({required: field.required})
 						break
 					case 'array':
 						// Simplified array handling - could be enhanced
-						builder[field.name] = array(string(), { required: field.required })
+						builder[field.name] = array(string(), {required: field.required})
 						break
 				}
 			}
@@ -363,14 +363,14 @@ export class ClayProto {
 	async create<S extends SchemaBuilder>(
 		schemaName: string,
 		data: Partial<InferSchemaType<S>>
-	): Promise<{ rkey: string; data: InferSchemaType<S> }> {
+	): Promise<{rkey: string; data: InferSchemaType<S>}> {
 		const schema = this.registry.get(schemaName)
 		if (!schema) {
 			throw new Error(`Schema "${schemaName}" not found. Did you call defineSchemas()?`)
 		}
 
 		// Apply defaults
-		const finalData = { ...data }
+		const finalData = {...data}
 		for (const [fieldName, fieldBuilder] of Object.entries(schema.builder)) {
 			if (finalData[fieldName] === undefined && fieldBuilder._config.default !== undefined) {
 				finalData[fieldName] = fieldBuilder._config.default
@@ -384,7 +384,7 @@ export class ClayProto {
 		}
 
 		// Create in PDS
-		const { rkey, record } = await this.sdk.createItem(
+		const {rkey, record} = await this.sdk.createItem(
 			`clay.user.${schemaName}`,
 			finalData as Record<string, unknown>
 		)
@@ -393,9 +393,9 @@ export class ClayProto {
 		if (!this.itemCache.has(schemaName)) {
 			this.itemCache.set(schemaName, new Map())
 		}
-		this.itemCache.get(schemaName)!.set(rkey, { ...record.data, _rkey: rkey })
+		this.itemCache.get(schemaName)!.set(rkey, {...record.data, _rkey: rkey})
 
-		return { rkey, data: finalData as InferSchemaType<S> }
+		return {rkey, data: finalData as InferSchemaType<S>}
 	}
 
 	/**
@@ -404,8 +404,8 @@ export class ClayProto {
 	async get<S extends SchemaBuilder>(
 		schemaName: string,
 		rkey: string,
-		options: { include?: Record<string, boolean> } = {}
-	): Promise<(InferSchemaType<S> & { _rkey: string }) | null> {
+		options: {include?: Record<string, boolean>} = {}
+	): Promise<(InferSchemaType<S> & {_rkey: string}) | null> {
 		// Check cache first
 		const cached = this.itemCache.get(schemaName)?.get(rkey)
 		if (cached) {
@@ -417,7 +417,7 @@ export class ClayProto {
 		// Fetch from PDS
 		try {
 			const item = await this.sdk.getItem(rkey)
-			const data = { ...item.data, _rkey: rkey }
+			const data = {...item.data, _rkey: rkey}
 
 			// Update cache
 			if (!this.itemCache.has(schemaName)) {
@@ -439,7 +439,7 @@ export class ClayProto {
 	async query<S extends SchemaBuilder>(
 		schemaName: string,
 		options: QueryOptions<InferSchemaType<S>> = {}
-	): Promise<(InferSchemaType<S> & { _rkey: string })[]> {
+	): Promise<(InferSchemaType<S> & {_rkey: string})[]> {
 		const schema = this.registry.get(schemaName)
 		if (!schema) {
 			throw new Error(`Schema "${schemaName}" not found`)
@@ -451,7 +451,7 @@ export class ClayProto {
 		// Filter by schema type
 		let results = items
 			.filter((item) => item.item.schemaType === `clay.user.${schemaName}`)
-			.map((item) => ({ ...item.item.data, _rkey: item.rkey }))
+			.map((item) => ({...item.item.data, _rkey: item.rkey}))
 
 		// Apply where clause
 		if (options.where) {
@@ -487,7 +487,7 @@ export class ClayProto {
 			results.map((item) => this.resolveRelations(schemaName, item, options.include))
 		)
 
-		return resolved as (InferSchemaType<S> & { _rkey: string })[]
+		return resolved as (InferSchemaType<S> & {_rkey: string})[]
 	}
 
 	/**
@@ -510,7 +510,7 @@ export class ClayProto {
 		}
 
 		// Merge with updates
-		const updated = { ...existing, ...data }
+		const updated = {...existing, ...data}
 
 		// Remove internal fields
 		delete updated._rkey
@@ -525,7 +525,7 @@ export class ClayProto {
 		await this.sdk.updateItem(rkey, `clay.user.${schemaName}`, updated as Record<string, unknown>)
 
 		// Update cache
-		this.itemCache.get(schemaName)?.set(rkey, { ...updated, _rkey: rkey })
+		this.itemCache.get(schemaName)?.set(rkey, {...updated, _rkey: rkey})
 
 		return updated as InferSchemaType<S>
 	}
@@ -553,7 +553,7 @@ export class ClayProto {
 		const schema = this.registry.get(schemaName)
 		if (!schema) return item
 
-		const resolved = { ...item }
+		const resolved = {...item}
 
 		for (const [fieldName, shouldInclude] of Object.entries(include)) {
 			if (!shouldInclude) continue
@@ -590,7 +590,7 @@ export class ClayProto {
 export class ValidationError extends Error {
 	constructor(
 		message: string,
-		public errors: ValidationError[]
+		public errors: FieldValidationError[]
 	) {
 		super(message)
 		this.name = 'ValidationError'
@@ -610,4 +610,4 @@ export const clay = {
 	validate
 }
 
-export { ClayProto as default }
+export {ClayProto as default}

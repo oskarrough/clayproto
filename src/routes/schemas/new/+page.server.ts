@@ -1,8 +1,8 @@
-import { ClayprotoSDK } from '$lib/atproto/sdk'
-import { redirect, fail } from '@sveltejs/kit'
-import type { Actions, PageServerLoad } from './$types'
+import {ClayprotoSDK} from '$lib/clayproto-sdk'
+import {redirect, fail} from '@sveltejs/kit'
+import type {Actions, PageServerLoad} from './$types'
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async ({locals}) => {
 	if (!locals.session) {
 		throw redirect(302, '/')
 	}
@@ -10,7 +10,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 }
 
 export const actions: Actions = {
-	default: async ({ request, locals }) => {
+	default: async ({request, locals}) => {
 		if (!locals.session) {
 			throw redirect(302, '/')
 		}
@@ -22,7 +22,7 @@ export const actions: Actions = {
 		const fieldsJson = formData.get('fields')
 
 		if (!nsid || !title || !fieldsJson) {
-			return fail(400, { error: 'Missing required fields' })
+			return fail(400, {error: 'Missing required fields'})
 		}
 
 		try {
@@ -39,7 +39,7 @@ export const actions: Actions = {
 			throw redirect(303, '/schemas')
 		} catch (err) {
 			console.error('Failed to create schema:', err)
-			return fail(500, { error: 'Failed to create schema' })
+			return fail(500, {error: 'Failed to create schema'})
 		}
 	}
 }

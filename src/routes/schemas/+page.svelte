@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { PageData } from './$types'
+	import type {PageData} from './$types'
 
-	let { data }: { data: PageData } = $props()
+	let {data}: {data: PageData} = $props()
 </script>
 
 <h1>Schemas</h1>
@@ -21,7 +21,10 @@
 					<p>{schema.description}</p>
 				{/if}
 				<p>{schema.fields.length} fields</p>
+				<p><a href="/items/new?schema={rkey}">Create {schema.title}</a></p>
 			</li>
 		{/each}
 	</ul>
 {/if}
+
+<p><a href="/items">View all items</a></p>

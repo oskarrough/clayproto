@@ -4,6 +4,7 @@
 	"semi": false,
 	"trailingComma": "none",
 	"printWidth": 100,
+	"bracketSpacing": false,
 	"plugins": ["prettier-plugin-svelte"],
 	"overrides": [
 		{

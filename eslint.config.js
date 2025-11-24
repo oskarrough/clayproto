@@ -1,8 +1,8 @@
-import { fileURLToPath } from 'node:url'
-import { includeIgnoreFile } from '@eslint/compat'
+import {fileURLToPath} from 'node:url'
+import {includeIgnoreFile} from '@eslint/compat'
 import js from '@eslint/js'
 import svelte from 'eslint-plugin-svelte'
-import { defineConfig } from 'eslint/config'
+import {defineConfig} from 'eslint/config'
 import globals from 'globals'
 import ts from 'typescript-eslint'
 import svelteConfig from './svelte.config.js'
@@ -11,13 +11,13 @@ const gitignorePath = fileURLToPath(new URL('./.gitignore', import.meta.url))
 
 export default defineConfig(
 	includeIgnoreFile(gitignorePath),
-	{ ignores: ['clayproto-api-sketch.ts', 'src/lib/clayproto/index.ts'] },
+	{ignores: ['clayproto-api-sketch.ts', 'src/lib/clayproto/index.ts']},
 	js.configs.recommended,
 	...ts.configs.recommended,
 	...svelte.configs.recommended,
 	{
 		languageOptions: {
-			globals: { ...globals.browser, ...globals.node }
+			globals: {...globals.browser, ...globals.node}
 		},
 		rules: {
 			// typescript-eslint strongly recommend that you do not use the no-undef lint rule on TypeScript projects.

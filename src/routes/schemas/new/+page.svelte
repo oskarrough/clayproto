@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { SchemaField } from '$lib/atproto/sdk'
+	import type {SchemaField} from '$lib/clayproto-sdk'
 
 	let nsid = $state('')
 	let title = $state('')
@@ -7,7 +7,7 @@
 	let fields = $state<SchemaField[]>([])
 
 	function addField() {
-		fields = [...fields, { name: '', type: 'string', required: false }]
+		fields = [...fields, {name: '', type: 'string', required: false}]
 	}
 
 	function removeField(index: number) {
