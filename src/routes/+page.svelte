@@ -10,6 +10,11 @@
 
 {#if data.did}
 	<p>Logged in as: {data.did}</p>
+	<nav>
+		<form method="get" action="/schemas">
+			<button type="submit">My Schemas</button>
+		</form>
+	</nav>
 	<form method="get" action="/auth/logout">
 		<button type="submit">Logout</button>
 	</form>

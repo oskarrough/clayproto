@@ -25,23 +25,24 @@ How it works (ATProto terms):
 
 ## TODO
 
-1. Read all resource URLs and extract relevant notes to research.md
-   - Focus on: OAuth flow, record/collection CRUD, Lexicon structure, dynamic schemas, NSID namespacing, $type field, AppView <-> PDS communication, querying records by type
-2. Set up OAuth authentication flow (connect to user's PDS)
-3. Create SDK class to wrap ATProto API calls
-4. Define Lexicon schemas for app.clayproto.schema and app.clayproto.item
-5. Build schema builder UI (form to create schema definitions)
-6. Implement schema CRUD operations
+1. ✅ Read all resource URLs and extract relevant notes to research.md
+2. ✅ Set up OAuth authentication flow (connect to user's PDS)
+3. ✅ Create SDK class to wrap ATProto API calls
+4. ✅ Define Lexicon schemas for app.clayproto.schema and app.clayproto.item
+5. ✅ Build schema builder UI (form to create schema definitions)
+6. ✅ Implement schema CRUD operations
 7. Build dynamic form generator (reads schema, generates input form)
 8. Implement item CRUD operations
 9. Build list/view UI for items
 
 ## OPEN QUESTIONS
 
-- Where do custom Lexicons live?
-- How do we namespace user schemas?
-- Discovery mechanism?
-- Can we use dynamic schemas without central Lexicon registration?
+See research.md for detailed answers. Summary:
+
+- Custom Lexicons: Hybrid approach - fixed wrappers with schema definitions as records
+- Namespace user schemas: clay.username.typename with collision detection
+- Discovery: AppView maintains searchable index
+- Dynamic schemas: Yes, via client-side validation of wrapper records
 
 ## TECHNICAL NOTES
 
