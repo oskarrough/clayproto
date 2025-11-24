@@ -5,6 +5,7 @@
 ATProto separates three critical layers: **identity, data storage, and application logic**. This enables portable accounts and user-controlled data while allowing developers to build interoperable apps on a shared ecosystem.
 
 ### Key Components
+
 - **DID (Distributed Identity)**: Cryptographic identity that remains consistent regardless of which PDS hosts the data
 - **PDS (Personal Data Store)**: User repositories that can be centrally hosted or self-hosted
 - **AppView**: Aggregates user repo data into a queryable database
@@ -19,7 +20,7 @@ Uses `@atproto/oauth-client-node` library. The flow:
 
 ```typescript
 const url = await oauthClient.authorize(handle, {
-  scope: 'atproto transition:generic',
+	scope: 'atproto transition:generic'
 })
 return res.redirect(url.toString())
 ```
@@ -35,9 +36,9 @@ Use Agent's repo methods with three parameters:
 
 ```typescript
 await agent.com.atproto.repo.getRecord({
-  repo: agent.assertDid,           // User identifier (DID)
-  collection: 'app.bsky.actor.profile',
-  rkey: 'self',                     // Record key
+	repo: agent.assertDid, // User identifier (DID)
+	collection: 'app.bsky.actor.profile',
+	rkey: 'self' // Record key
 })
 ```
 
@@ -47,13 +48,13 @@ Use `putRecord` with a time-based key:
 
 ```typescript
 await agent.com.atproto.repo.putRecord({
-  repo: agent.assertDid,
-  collection: 'xyz.statusphere.status',
-  rkey: TID.nextStr(),              // Time-based identifier
-  record: {
-    status: "👍",
-    createdAt: new Date().toISOString()
-  }
+	repo: agent.assertDid,
+	collection: 'xyz.statusphere.status',
+	rkey: TID.nextStr(), // Time-based identifier
+	record: {
+		status: '👍',
+		createdAt: new Date().toISOString()
+	}
 })
 ```
 
@@ -75,11 +76,13 @@ All schemas require three core properties:
 
 ```json
 {
-  "lexicon": 1,
-  "id": "com.example.recordType",
-  "defs": {
-    "main": { /* definition */ }
-  }
+	"lexicon": 1,
+	"id": "com.example.recordType",
+	"defs": {
+		"main": {
+			/* definition */
+		}
+	}
 }
 ```
 
@@ -87,32 +90,32 @@ All schemas require three core properties:
 
 ```json
 {
-  "lexicon": 1,
-  "id": "app.clayproto.item",
-  "defs": {
-    "main": {
-      "type": "record",
-      "key": "tid",
-      "record": {
-        "type": "object",
-        "required": ["schemaType", "data", "createdAt"],
-        "properties": {
-          "schemaType": {
-            "type": "string",
-            "description": "NSID of the schema this item follows"
-          },
-          "data": {
-            "type": "unknown",
-            "description": "Dynamic data matching the schema"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "datetime"
-          }
-        }
-      }
-    }
-  }
+	"lexicon": 1,
+	"id": "app.clayproto.item",
+	"defs": {
+		"main": {
+			"type": "record",
+			"key": "tid",
+			"record": {
+				"type": "object",
+				"required": ["schemaType", "data", "createdAt"],
+				"properties": {
+					"schemaType": {
+						"type": "string",
+						"description": "NSID of the schema this item follows"
+					},
+					"data": {
+						"type": "unknown",
+						"description": "Dynamic data matching the schema"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "datetime"
+					}
+				}
+			}
+		}
+	}
 }
 ```
 
@@ -135,6 +138,7 @@ lex gen-server ./src/lexicon ./lexicons/*
   - `com.atproto.repo.getRecord` - API endpoints
 
 ### Namespace Management
+
 - Organized hierarchically using DNS-style naming
 - Clear ownership via domain control
 - Minimal collision risk across multi-team development
@@ -146,18 +150,19 @@ Every record includes a `$type` field identifying its schema:
 
 ```json
 {
-  "$type": "app.clayproto.item",
-  "schemaType": "clay.music.track",
-  "data": {
-    "url": "https://...",
-    "title": "Song Name",
-    "tags": ["rock", "alternative"]
-  },
-  "createdAt": "2025-11-24T10:30:00Z"
+	"$type": "app.clayproto.item",
+	"schemaType": "clay.music.track",
+	"data": {
+		"url": "https://...",
+		"title": "Song Name",
+		"tags": ["rock", "alternative"]
+	},
+	"createdAt": "2025-11-24T10:30:00Z"
 }
 ```
 
 The `$type` field:
+
 - Identifies which Lexicon schema the record follows
 - Used in validation before publishing
 - Establishes record's AT URI: `at://did:plc:user/app.clayproto.item/12345`
@@ -177,13 +182,12 @@ Monitor network events for specific collections:
 
 ```typescript
 new Firehose({
-  filterCollections: ['app.clayproto.item', 'app.clayproto.schema'],
-  handleEvent: async (evt) => {
-    if ((evt.event === 'create' || evt.event === 'update') &&
-        isValidRecord(evt.record)) {
-      // Persist to AppView database
-    }
-  },
+	filterCollections: ['app.clayproto.item', 'app.clayproto.schema'],
+	handleEvent: async (evt) => {
+		if ((evt.event === 'create' || evt.event === 'update') && isValidRecord(evt.record)) {
+			// Persist to AppView database
+		}
+	}
 })
 ```
 
@@ -197,9 +201,9 @@ Improve UX by immediately writing to local database after successful repo writes
 
 ```typescript
 await agent.com.atproto.repo.getRecord({
-  repo: userDid,
-  collection: 'app.clayproto.item',
-  rkey: recordKey,
+	repo: userDid,
+	collection: 'app.clayproto.item',
+	rkey: recordKey
 })
 ```
 
@@ -207,14 +211,15 @@ await agent.com.atproto.repo.getRecord({
 
 ```typescript
 await agent.com.atproto.repo.listRecords({
-  repo: userDid,
-  collection: 'app.clayproto.item',
+	repo: userDid,
+	collection: 'app.clayproto.item'
 })
 ```
 
 ### AppView Custom Queries
 
 Build custom query endpoints in your AppView to filter by:
+
 - Schema type
 - Tags/metadata
 - Date ranges
@@ -245,21 +250,22 @@ Since Lexicons must be published and versioned, true runtime dynamic schemas are
 
 ```json
 {
-  "$type": "app.clayproto.schema",
-  "nsid": "clay.music.track",
-  "title": "Music Track",
-  "fields": [
-    { "name": "url", "type": "string", "required": true },
-    { "name": "title", "type": "string", "required": true },
-    { "name": "tags", "type": "array", "items": "string" }
-  ],
-  "createdAt": "2025-11-24T10:00:00Z"
+	"$type": "app.clayproto.schema",
+	"nsid": "clay.music.track",
+	"title": "Music Track",
+	"fields": [
+		{ "name": "url", "type": "string", "required": true },
+		{ "name": "title", "type": "string", "required": true },
+		{ "name": "tags", "type": "array", "items": "string" }
+	],
+	"createdAt": "2025-11-24T10:00:00Z"
 }
 ```
 
 ## Schema Evolution & Validation
 
 **Constraint Immutability**: Published Lexicon schemas cannot modify existing constraints:
+
 - Loosening constraints breaks old software validation
 - Tightening constraints breaks new software
 - Only add optional constraints to previously unconstrained fields
@@ -272,12 +278,8 @@ Use tokens instead of hard-coded enums for extensibility:
 
 ```json
 {
-  "type": "string",
-  "knownValues": [
-    "clay.type.book",
-    "clay.type.game",
-    "clay.type.recipe"
-  ]
+	"type": "string",
+	"knownValues": ["clay.type.book", "clay.type.game", "clay.type.recipe"]
 }
 ```
 
@@ -286,6 +288,7 @@ Allows adding new types without breaking existing validation.
 ## Serverless Implementation Notes
 
 ### Cloudflare Workers Stack
+
 - **Workers**: Global code deployment within 50ms of users
 - **KV**: Distributed caching for handle-to-DID mappings
 - **D1**: Distributed relational database for AppView data
@@ -294,6 +297,7 @@ Allows adding new types without breaking existing validation.
 ### Firehose on Serverless
 
 Traditional persistent WebSocket connections don't work on serverless platforms. Solutions:
+
 - **Cron Triggers** with cursors stored in Durable Objects
 - **Batch-poll Jetstream** events instead of persistent connections
 - Store last cursor position to resume on next trigger
@@ -303,6 +307,7 @@ Traditional persistent WebSocket connections don't work on serverless platforms.
 ### Where do custom Lexicons live?
 
 Lexicons are JSON files that must be:
+
 1. Published and accessible via NSID
 2. Hosted at a discoverable location
 3. Registered for code generation
@@ -312,11 +317,13 @@ For clayproto's dynamic schemas, use a **hybrid approach**: fixed Lexicons for w
 ### How do we namespace user schemas?
 
 **Option 1**: Use a prefix convention within the data
+
 - User schemas: `clay.username.typename`
 - Stored as string in `schemaType` field
 - Not actual Lexicons, just identifiers
 
 **Option 2**: Use user's DID in namespace
+
 - `clay.{did}.typename`
 - More collision-resistant
 - Longer identifiers
@@ -335,6 +342,7 @@ For clayproto's dynamic schemas, use a **hybrid approach**: fixed Lexicons for w
 ### Can we use dynamic schemas without central Lexicon registration?
 
 **Yes, with the hybrid approach**:
+
 - Core Lexicons (`app.clayproto.schema`, `app.clayproto.item`) are fixed and registered
 - User schema definitions live as records (JSON data)
 - Client-side validation handles the dynamic aspect

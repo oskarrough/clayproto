@@ -24,11 +24,13 @@ After completing the code, ask the user if they want a playground link. Only cal
 
 ## Workflow Preferences
 
-- We're using jujutsu for version control, use `jj` instead of `git` for commands
+- Use `jj` for version control (not git)
+- Use `bun` for package management (not npm)
 - Remember to lint
-- Be verbose in explanations
+- Don't be verbose - keep explanations concise
 - Don't ask "what should I do next?" - be proactive and surface info from plan.md
 - In jj, changes are automatically tracked - no need to explicitly commit
 - Use `jj new -m "message"` to create new changes for each logical task
 - Update CLAUDE.md liberally as you learn our workflow patterns
 - Surface todos from plan.md and work through them systematically
+- use bun, not npm

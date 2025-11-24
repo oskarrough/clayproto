@@ -9,6 +9,7 @@ An AppView that lets users mold software to their needs. Create custom data mode
 Example: User wants to track "music tracks" with url, title, and tags.
 
 How it works (ATProto terms):
+
 - AppView that aggregates data from user repos
 - Schema definitions stored as records in collection: app.clayproto.schema
 - User data stored as records in collection: app.clayproto.item
@@ -16,12 +17,14 @@ How it works (ATProto terms):
 - Everything lives in user's data repo on their PDS
 
 ## RESOURCES
+
 - https://atproto.com/guides/applications
 - https://blog.cloudflare.com/serverless-atproto/
 - https://kevinhoffman.blog/posts/decentralized_atproto/
 - https://atproto.com/guides/lexicon
 
 ## TODO
+
 1. Read all resource URLs and extract relevant notes to research.md
    - Focus on: OAuth flow, record/collection CRUD, Lexicon structure, dynamic schemas, NSID namespacing, $type field, AppView <-> PDS communication, querying records by type
 2. Set up OAuth authentication flow (connect to user's PDS)
@@ -34,12 +37,14 @@ How it works (ATProto terms):
 9. Build list/view UI for items
 
 ## OPEN QUESTIONS
+
 - Where do custom Lexicons live?
 - How do we namespace user schemas?
 - Discovery mechanism?
 - Can we use dynamic schemas without central Lexicon registration?
 
 ## TECHNICAL NOTES
+
 - Stack: SvelteKit
 - Build class-based SDK for sanity (wrap ATProto interactions)
 - Using jj (jujutsu) for version control (jj new, jj describe, check jj help)
