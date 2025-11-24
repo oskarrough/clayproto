@@ -5,8 +5,7 @@
  * Wraps the low-level SDK with schema builders, validation, and relations.
  */
 
-import {ClayprotoSDK, type SchemaField} from './clayproto-sdk'
-import type {OAuthSession} from '@atproto/oauth-client-node'
+import {clayprotoSDK, type SchemaField} from './clayproto-sdk'
 
 // ============================================================================
 // TYPES
@@ -276,19 +275,18 @@ function fieldBuilderToSchemaField(name: string, builder: FieldBuilder<unknown>)
  * High-level ClayProto SDK
  */
 export class ClayProto {
-	private sdk: ClayprotoSDK
 	private registry: SchemaRegistry = new SchemaRegistry()
 	private itemCache: Map<string, Map<string, unknown>> = new Map()
 
-	constructor(session: OAuthSession) {
-		this.sdk = new ClayprotoSDK(session)
+	constructor() {
+		// Uses the global clayprotoSDK singleton
 	}
 
 	/**
 	 * Get the user's DID
 	 */
 	get did() {
-		return this.sdk.did
+		return clayprotoSDK.did
 	}
 
 	/**
@@ -313,7 +311,7 @@ export class ClayProto {
 			}
 
 			// Create schema in PDS
-			const {rkey} = await this.sdk.createSchema(schemaDefinition)
+			const {rkey} = await clayprotoSDK.createSchema(schemaDefinition)
 			rkeys[name] = rkey
 
 			// Register in local registry
@@ -327,7 +325,7 @@ export class ClayProto {
 	 * Load existing schemas from PDS
 	 */
 	async loadSchemas() {
-		const schemas = await this.sdk.listSchemas()
+		const schemas = await clayprotoSDK.listSchemas()
 
 		for (const {rkey, schema} of schemas) {
 			// Convert SchemaDefinition back to SchemaBuilder
@@ -370,7 +368,7 @@ export class ClayProto {
 		}
 
 		// Apply defaults
-		const finalData = {...data}
+		const finalData: Record<string, unknown> = {...data}
 		for (const [fieldName, fieldBuilder] of Object.entries(schema.builder)) {
 			if (finalData[fieldName] === undefined && fieldBuilder._config.default !== undefined) {
 				finalData[fieldName] = fieldBuilder._config.default
@@ -384,7 +382,7 @@ export class ClayProto {
 		}
 
 		// Create in PDS
-		const {rkey, record} = await this.sdk.createItem(
+		const {rkey, record} = await clayprotoSDK.createItem(
 			`clay.user.${schemaName}`,
 			finalData as Record<string, unknown>
 		)
@@ -407,16 +405,20 @@ export class ClayProto {
 		options: {include?: Record<string, boolean>} = {}
 	): Promise<(InferSchemaType<S> & {_rkey: string}) | null> {
 		// Check cache first
-		const cached = this.itemCache.get(schemaName)?.get(rkey)
+		const cached = this.itemCache.get(schemaName)?.get(rkey) as Record<string, unknown> | undefined
 		if (cached) {
-			return this.resolveRelations(schemaName, cached, options.include) as InferSchemaType<S> & {
+			return (await this.resolveRelations(
+				schemaName,
+				cached,
+				options.include
+			)) as InferSchemaType<S> & {
 				_rkey: string
 			}
 		}
 
 		// Fetch from PDS
 		try {
-			const item = await this.sdk.getItem(rkey)
+			const item = await clayprotoSDK.getItem(rkey)
 			const data = {...item.data, _rkey: rkey}
 
 			// Update cache
@@ -425,7 +427,11 @@ export class ClayProto {
 			}
 			this.itemCache.get(schemaName)!.set(rkey, data)
 
-			return this.resolveRelations(schemaName, data, options.include) as InferSchemaType<S> & {
+			return (await this.resolveRelations(
+				schemaName,
+				data,
+				options.include
+			)) as InferSchemaType<S> & {
 				_rkey: string
 			}
 		} catch {
@@ -446,10 +452,10 @@ export class ClayProto {
 		}
 
 		// Fetch all items from PDS
-		const items = await this.sdk.listItems()
+		const items = await clayprotoSDK.listItems()
 
 		// Filter by schema type
-		let results = items
+		let results: Record<string, unknown>[] = items
 			.filter((item) => item.item.schemaType === `clay.user.${schemaName}`)
 			.map((item) => ({...item.item.data, _rkey: item.rkey}))
 
@@ -470,8 +476,8 @@ export class ClayProto {
 		if (options.orderBy) {
 			const [[field, direction]] = Object.entries(options.orderBy)
 			results.sort((a, b) => {
-				const aVal = a[field]
-				const bVal = b[field]
+				const aVal = a[field] as string | number
+				const bVal = b[field] as string | number
 				const comparison = aVal < bVal ? -1 : aVal > bVal ? 1 : 0
 				return direction === 'desc' ? -comparison : comparison
 			})
@@ -513,28 +519,32 @@ export class ClayProto {
 		const updated = {...existing, ...data}
 
 		// Remove internal fields
-		delete updated._rkey
+		const {_rkey: _, ...updateData} = updated
 
 		// Validate
-		const validation = validate(schema.builder, updated as Record<string, unknown>)
+		const validation = validate(schema.builder, updateData as Record<string, unknown>)
 		if (!validation.valid) {
 			throw new ValidationError('Validation failed', validation.errors)
 		}
 
 		// Update in PDS
-		await this.sdk.updateItem(rkey, `clay.user.${schemaName}`, updated as Record<string, unknown>)
+		await clayprotoSDK.updateItem(
+			rkey,
+			`clay.user.${schemaName}`,
+			updateData as Record<string, unknown>
+		)
 
 		// Update cache
-		this.itemCache.get(schemaName)?.set(rkey, {...updated, _rkey: rkey})
+		this.itemCache.get(schemaName)?.set(rkey, {...updateData, _rkey: rkey})
 
-		return updated as InferSchemaType<S>
+		return updateData as InferSchemaType<S>
 	}
 
 	/**
 	 * Delete an item
 	 */
 	async delete(schemaName: string, rkey: string): Promise<void> {
-		await this.sdk.deleteItem(rkey)
+		await clayprotoSDK.deleteItem(rkey)
 
 		// Remove from cache
 		this.itemCache.get(schemaName)?.delete(rkey)

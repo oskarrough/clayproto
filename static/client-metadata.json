@@ -1,8 +1,7 @@
 {
-	"client_id": "http://localhost:5173/client-metadata.json",
 	"client_name": "clayproto",
-	"client_uri": "http://localhost:5173",
-	"redirect_uris": ["http://localhost:5173/auth/callback"],
+	"client_uri": "https://clayproto.pages.dev",
+	"redirect_uris": ["https://clayproto.pages.dev/"],
 	"scope": "atproto transition:generic",
 	"grant_types": ["authorization_code", "refresh_token"],
 	"response_types": ["code"],

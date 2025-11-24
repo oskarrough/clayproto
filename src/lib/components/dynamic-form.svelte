@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type {SchemaField} from '$lib/atproto/sdk'
+	import type {SchemaField} from '$lib/clayproto-sdk'
 
 	interface Props {
 		fields: SchemaField[]
@@ -86,7 +86,12 @@
 				required={field.required}
 			/>
 		{:else if field.type === 'boolean'}
-			<input type="checkbox" id="{uid}-{field.name}" bind:checked={formData[field.name]} />
+			<input
+				type="checkbox"
+				id="{uid}-{field.name}"
+				checked={formData[field.name] as boolean}
+				onchange={(e) => (formData[field.name] = (e.target as HTMLInputElement).checked)}
+			/>
 		{:else if field.type === 'array'}
 			<div id="{uid}-{field.name}">
 				{#each (formData[field.name] as unknown[]) || [] as item, i (i)}

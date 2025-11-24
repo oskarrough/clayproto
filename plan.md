@@ -1,6 +1,6 @@
 # clayproto: Building Applications Within Applications
 
-## DESCRIPTION
+## CONCEPT
 
 Malleable, manpage-style, cool, usable, FREE software. No selling. Hacker ethos.
 
@@ -15,6 +15,14 @@ How it works (ATProto terms):
 - User data stored as records in collection: app.clayproto.item
 - Each record has $type field identifying which schema it follows
 - Everything lives in user's data repo on their PDS
+
+## WEBAPP
+
+Minimal, malleable POC. Single routes for each purpose:
+
+1. Let users create schemas (define what they want to track)
+2. Let users create/view/edit items using those schemas
+3. (Future) Aggregate data from other users via AppView
 
 ## RESOURCES
 
@@ -31,9 +39,10 @@ How it works (ATProto terms):
 4. ✅ Define Lexicon schemas for app.clayproto.schema and app.clayproto.item
 5. ✅ Build schema builder UI (form to create schema definitions)
 6. ✅ Implement schema CRUD operations
-7. Build dynamic form generator (reads schema, generates input form)
-8. Implement item CRUD operations
-9. Build list/view UI for items
+7. ✅ Build dynamic form generator (reads schema, generates input form)
+8. ✅ Implement item CRUD operations (SDK done, routes wired)
+9. ✅ Build list/view UI for items (/schemas/[rkey] shows items)
+10. Fix type errors and test full flow
 
 ## OPEN QUESTIONS
 
