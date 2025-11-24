@@ -33,4 +33,5 @@ After completing the code, ask the user if they want a playground link. Only cal
 - Use `jj new -m "message"` to create new changes for each logical task
 - Update CLAUDE.md liberally as you learn our workflow patterns
 - Surface todos from plan.md and work through them systematically
-- use bun, not npm
+- Don't use UPPERCASE for const names - use camelCase
+- Avoid unnecessary wrapper functions - export classes directly

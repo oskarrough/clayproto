@@ -11,6 +11,7 @@ const gitignorePath = fileURLToPath(new URL('./.gitignore', import.meta.url))
 
 export default defineConfig(
 	includeIgnoreFile(gitignorePath),
+	{ ignores: ['clayproto-api-sketch.ts'] },
 	js.configs.recommended,
 	...ts.configs.recommended,
 	...svelte.configs.recommended,

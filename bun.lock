@@ -6,6 +6,7 @@
       "name": "atproto",
       "dependencies": {
         "@atproto/api": "^0.18.1",
+        "@atproto/common-web": "^0.4.3",
         "@atproto/oauth-client-node": "^0.3.10",
       },
       "devDependencies": {
