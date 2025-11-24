@@ -1,7 +1,10 @@
 {
 	"name": "clayproto",
+	"account_id": "b29de5cf62555d67d57242aeddc91344",
+	"main": ".svelte-kit/cloudflare/_worker.js",
 	"compatibility_date": "2025-11-24",
 	"assets": {
-		"directory": "./build"
+		"binding": "ASSETS",
+		"directory": ".svelte-kit/cloudflare"
 	}
 }

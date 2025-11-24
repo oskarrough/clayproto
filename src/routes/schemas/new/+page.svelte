@@ -128,7 +128,7 @@
 										data-text
 										type="button"
 										onclick={() => removeField(i)}
-										disabled={submitting}>x</button
+										disabled={submitting}>delete field</button
 									>
 								</p>
 							{/each}
