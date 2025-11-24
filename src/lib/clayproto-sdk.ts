@@ -88,10 +88,11 @@ export const clayprotoSDK = {
 	},
 
 	async updateSchema(rkey: string, schema: Omit<SchemaDefinition, '$type' | 'createdAt'>) {
+		const existing = await this.getSchema(rkey)
 		const record: SchemaDefinition = {
 			$type: schemaCollection,
 			...schema,
-			createdAt: new Date().toISOString()
+			createdAt: existing.createdAt
 		}
 		await getAgent().com.atproto.repo.putRecord({
 			repo: getDid(),
@@ -153,11 +154,12 @@ export const clayprotoSDK = {
 	},
 
 	async updateItem(rkey: string, schema: string, data: Record<string, unknown>) {
+		const existing = await this.getItem(rkey)
 		const record: ItemData = {
 			$type: itemCollection,
 			schema,
 			data,
-			createdAt: new Date().toISOString()
+			createdAt: existing.createdAt
 		}
 		await getAgent().com.atproto.repo.putRecord({
 			repo: getDid(),

@@ -88,7 +88,7 @@
 							<p>
 								└─ {schema.fields
 									.slice(0, 2)
-									.map((f) => item.data[f.name])
+									.map((f) => item?.data[f.name])
 									.filter(Boolean)
 									.join(' ') || $page.params.itemRkey}/
 								<button data-text onclick={handleDelete} disabled={deleting}
