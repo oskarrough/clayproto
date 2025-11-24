@@ -1,0 +1,67 @@
+{
+	"lexicon": 1,
+	"id": "app.clayproto.schema",
+	"defs": {
+		"main": {
+			"type": "record",
+			"key": "tid",
+			"description": "Schema definition for custom data models",
+			"record": {
+				"type": "object",
+				"required": ["nsid", "title", "fields", "createdAt"],
+				"properties": {
+					"nsid": {
+						"type": "string",
+						"description": "Namespace identifier for this schema (e.g., clay.music.track)"
+					},
+					"title": {
+						"type": "string",
+						"maxGraphemes": 100,
+						"description": "Human-readable title for this schema"
+					},
+					"description": {
+						"type": "string",
+						"maxGraphemes": 500,
+						"description": "Optional description of what this schema represents"
+					},
+					"fields": {
+						"type": "array",
+						"items": {
+							"type": "ref",
+							"ref": "#field"
+						},
+						"description": "Field definitions for this schema"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "datetime"
+					}
+				}
+			}
+		},
+		"field": {
+			"type": "object",
+			"required": ["name", "type"],
+			"properties": {
+				"name": {
+					"type": "string",
+					"maxGraphemes": 50,
+					"description": "Field name"
+				},
+				"type": {
+					"type": "string",
+					"knownValues": ["string", "number", "boolean", "array"],
+					"description": "Field data type"
+				},
+				"items": {
+					"type": "string",
+					"description": "For array type, the type of items in the array"
+				},
+				"required": {
+					"type": "boolean",
+					"description": "Whether this field is required"
+				}
+			}
+		}
+	}
+}

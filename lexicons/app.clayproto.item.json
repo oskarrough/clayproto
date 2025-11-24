@@ -1,0 +1,29 @@
+{
+	"lexicon": 1,
+	"id": "app.clayproto.item",
+	"defs": {
+		"main": {
+			"type": "record",
+			"key": "tid",
+			"description": "User data item following a custom schema",
+			"record": {
+				"type": "object",
+				"required": ["schemaType", "data", "createdAt"],
+				"properties": {
+					"schemaType": {
+						"type": "string",
+						"description": "NSID of the schema this item follows"
+					},
+					"data": {
+						"type": "unknown",
+						"description": "Dynamic data matching the referenced schema"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "datetime"
+					}
+				}
+			}
+		}
+	}
+}
