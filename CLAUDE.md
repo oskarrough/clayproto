@@ -21,4 +21,14 @@ You MUST use this tool whenever writing Svelte code before sending it to the use
 
 Generates a Svelte Playground link with the provided code.
 After completing the code, ask the user if they want a playground link. Only call this tool after user confirmation and NEVER if code was written to files in their project.
-- we're using jujutsu for version control, use `jj` instead of `git` for commands. remember to lint. be verbose
+
+## Workflow Preferences
+
+- We're using jujutsu for version control, use `jj` instead of `git` for commands
+- Remember to lint
+- Be verbose in explanations
+- Don't ask "what should I do next?" - be proactive and surface info from plan.md
+- In jj, changes are automatically tracked - no need to explicitly commit
+- Use `jj new -m "message"` to create new changes for each logical task
+- Update CLAUDE.md liberally as you learn our workflow patterns
+- Surface todos from plan.md and work through them systematically
