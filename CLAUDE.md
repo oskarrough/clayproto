@@ -9,6 +9,7 @@
 - Use `bun` and `bunx` for package management (not npm)
 - Don't be verbose - keep explanations concise
 - Avoid unnecessary wrapper functions - export classes directly
+- When you need direction, ask 1-2 questions to the user, not more at once.
 
 ## UI principles
 
