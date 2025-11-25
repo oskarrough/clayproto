@@ -1,23 +1,44 @@
 # clayproto
 
-Warnings. This is mostly me learning how you can build on AT Protocol.
+user-defined schemas on ATProto. your data, your structure, your server.
 
-## The problem
+## the problem
 
-ATProto lets you store arbitrary records in your personal repository. Lexicons formalize these types. But lexicons require deploying infrastructure—AppViews, indexers and so on. 
+ATProto gives you a personal data server. in theory, your data is portable and yours. in practice, you only get to store what apps define — Bluesky stores posts, likes, follows. what about everything else? your reading list, recipes, project notes, workout logs?
 
-## What this does
+you could use Notion or Airtable, but then we are back to someone else's server.
 
-Clayproto is a web interface for defining schemas and writing records to your PDS. 
+## the idea
 
-1. You own an AT Protocol account, for example Bluesky.
-2. You describe your data model through forms on the clayproto website 
-3. You create records either through clayproto or directly with the ATProto API. They live at `app.clayproto.schema` and `app.clayproto.item` in your repository, not ours.
+Clayproto lets you define schemas and store structured data in your PDS. same infrastructure that holds your Bluesky posts, but for anything you want to track.
 
-Think WordPress ACF or Sanity's content studio, but the substrate is your personal datastore instead of their MySQL instance. I'm not convinced that this idea is really useful,
-but hopefully this prototype can answer it later.
+portable, queryable, yours.
 
-## Trade-offs
+## how it works
 
-You get auth, structured storage, zero infrastructure (that you control), portable data.  
-You don't get: queries, reactivity, shared schemas, automatic app interop. The query layer is someone else's problem. Possibly yours later, if your movie collection gets unwieldy. But the writes are free and the data is yours.
+```
+/@handle.bsky.social/schemas/
+└── books/
+    ├── fields/
+    │   ├── title        string, required
+    │   ├── author       string
+    │   └── rating       number
+    └── items/
+        ├── dune
+        └── neuromancer
+```
+
+two record types in your PDS:
+
+```
+app.clayproto.schema   — field definitions
+app.clayproto.item     — data referencing a schema
+```
+
+auth via any ATProto account. query your data directly via the ATProto API — clayproto is just one interface.
+
+## status
+
+working: schemas and items (CRUD via UI or API)
+
+planned: views (filters, sorting, grouping), schema forking
