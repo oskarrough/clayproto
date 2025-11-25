@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type {SchemaField} from '$lib/clayproto-sdk'
+	import type {SchemaField} from '$lib/clayproto'
 
 	interface Props {
 		fields: SchemaField[]

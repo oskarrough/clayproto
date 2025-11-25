@@ -20,16 +20,16 @@
 ### Single Entry Point
 
 ```ts
-import {schema, string, number, boolean, ref, array} from '$lib/clay'
+import {schema, string, number, boolean, ref, array} from '$lib/clayproto'
 ```
 
 ### Schema Definition Returns a Collection
 
 ```ts
 const Task = schema('Task', {
-  title: string({required: true}),
-  done: boolean({default: false}),
-  assignee: ref('User')
+	title: string({required: true}),
+	done: boolean({default: false}),
+	assignee: ref('User')
 })
 
 // Task is now a collection with bound methods
@@ -52,6 +52,7 @@ type TaskData = InferSchema<typeof Task>
 ### `$lib/clay.ts` (single public module)
 
 Exports:
+
 - `schema(name, fields)` → returns `Collection`
 - `string(config?)`, `number(config?)`, `boolean(config?)`, `ref(schema, config?)`, `array(items, config?)`
 - `validate(fields, data)` → `ValidationResult`
@@ -61,6 +62,7 @@ Exports:
 ### `$lib/clay/atproto.ts` (internal, not exported)
 
 Low-level ATProto operations, no wrapper object:
+
 - `createRecord(collection, rkey, data)`
 - `getRecord(collection, rkey, did?)`
 - `listRecords(collection, did?)`
@@ -78,6 +80,7 @@ Low-level ATProto operations, no wrapper object:
 ### Step 1: Create `$lib/clay/atproto.ts`
 
 Extract low-level functions from `clayproto-sdk.ts`:
+
 - Remove the `clayprotoSDK` object wrapper
 - Export functions directly
 - Keep schema/item collection constants here
@@ -85,6 +88,7 @@ Extract low-level functions from `clayproto-sdk.ts`:
 ### Step 2: Create `$lib/clay/validate.ts`
 
 Move validation logic:
+
 - `validate()` function
 - `ValidationError` class
 - Type checks
@@ -92,6 +96,7 @@ Move validation logic:
 ### Step 3: Create `$lib/clay/collection.ts`
 
 New `Collection` class/factory:
+
 - Holds schema name, field definitions, rkey (once synced)
 - Methods: `create`, `get`, `query`, `update`, `delete`
 - Internal caching
@@ -99,6 +104,7 @@ New `Collection` class/factory:
 ### Step 4: Create `$lib/clay.ts`
 
 Public API:
+
 - `schema()` function that returns a Collection
 - Re-export field builders
 - Re-export types

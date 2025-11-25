@@ -117,6 +117,6 @@ export function buildClientId(): string {
 		const base = buildLoopbackClientId(loc)
 		return `${base}&scope=${encodeURIComponent(scopes)}`
 	}
-	// Production: use client-metadata.json
-	return `${window.location.protocol}//${window.location.host}/client-metadata.json`
+	// Production: use oauth-client-metadata.json for cleaner authorize screen
+	return `${window.location.protocol}//${window.location.host}/oauth-client-metadata.json`
 }

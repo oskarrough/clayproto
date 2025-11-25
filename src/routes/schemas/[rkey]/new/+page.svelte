@@ -2,12 +2,12 @@
 	import {onMount} from 'svelte'
 	import {goto} from '$app/navigation'
 	import {session} from '$lib/session'
-	import {clayprotoSDK, type SchemaDefinition} from '$lib/clayproto-sdk'
+	import {clay, tid, SCHEMA, ITEM, type Schema} from '$lib/clayproto'
 	import DynamicForm from '$lib/components/dynamic-form.svelte'
 
 	const {params} = $props()
 
-	let schema = $state<SchemaDefinition | null>(null)
+	let schema = $state<Schema | null>(null)
 	let loading = $state(true)
 	let submitting = $state(false)
 	let error = $state('')
@@ -27,7 +27,7 @@
 		if (!rkey) return
 
 		try {
-			schema = await clayprotoSDK.getSchema(rkey)
+			schema = (await clay.getRecord(SCHEMA, rkey)) as Schema
 		} catch (err) {
 			error = (err as Error).message
 		} finally {
@@ -44,7 +44,12 @@
 		submitting = true
 
 		try {
-			await clayprotoSDK.createItem(schemaRkey, dynamicForm.formData)
+			await clay.putRecord(ITEM, tid(), {
+				$type: ITEM,
+				schema: schemaRkey,
+				data: dynamicForm.formData,
+				createdAt: new Date().toISOString()
+			})
 			goto(`/schemas/${schemaRkey}`)
 		} catch (err) {
 			error = (err as Error).message

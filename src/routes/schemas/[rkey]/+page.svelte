@@ -3,10 +3,10 @@
 	import {goto} from '$app/navigation'
 	import {page} from '$app/stores'
 	import {session} from '$lib/session'
-	import {clayprotoSDK, type SchemaDefinition, type ItemData} from '$lib/clayproto-sdk'
+	import {clay, SCHEMA, ITEM, type Schema, type Item} from '$lib/clayproto'
 
-	let schema = $state<SchemaDefinition | null>(null)
-	let items = $state<{rkey: string; item: ItemData}[]>([])
+	let schema = $state<Schema | null>(null)
+	let items = $state<{rkey: string; item: Item}[]>([])
 	let loading = $state(true)
 	let error = $state('')
 	let deleting = $state(false)
@@ -17,7 +17,7 @@
 
 		deleting = true
 		try {
-			await clayprotoSDK.deleteSchema(rkey)
+			await clay.deleteRecord(SCHEMA, rkey)
 			goto('/schemas')
 		} catch (err) {
 			error = (err as Error).message
@@ -37,8 +37,11 @@
 		if (!rkey) return
 
 		try {
-			schema = await clayprotoSDK.getSchema(rkey)
-			items = await clayprotoSDK.listItemsBySchema(rkey)
+			schema = (await clay.getRecord(SCHEMA, rkey)) as Schema
+			const allItems = await clay.listRecords(ITEM)
+			items = allItems
+				.filter((r) => (r.value as Item).schema === rkey)
+				.map((r) => ({rkey: r.rkey, item: r.value as Item}))
 		} catch (err) {
 			error = (err as Error).message
 		} finally {

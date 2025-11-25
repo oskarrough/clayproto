@@ -2,7 +2,7 @@
 	import {onMount} from 'svelte'
 	import {goto} from '$app/navigation'
 	import {session} from '$lib/session'
-	import {clayprotoSDK, type SchemaField} from '$lib/clayproto-sdk'
+	import {clay, tid, SCHEMA, type SchemaField} from '$lib/clayproto'
 	import type {Snapshot} from './$types'
 
 	const uid = $props.id()
@@ -46,9 +46,11 @@
 		submitting = true
 
 		try {
-			await clayprotoSDK.createSchema({
+			await clay.putRecord(SCHEMA, tid(), {
+				$type: SCHEMA,
 				name,
-				fields
+				fields,
+				createdAt: new Date().toISOString()
 			})
 			goto('/schemas')
 		} catch (err) {

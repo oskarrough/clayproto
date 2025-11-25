@@ -3,12 +3,13 @@
 	import {goto} from '$app/navigation'
 	import {page} from '$app/stores'
 	import {session} from '$lib/session'
-	import {clayprotoSDK, type SchemaField} from '$lib/clayproto-sdk'
+	import {clay, SCHEMA, type Schema, type SchemaField} from '$lib/clayproto'
 
 	const uid = $props.id()
 
 	let name = $state('')
 	let fields = $state<SchemaField[]>([])
+	let createdAt = $state('')
 	let loading = $state(true)
 	let submitting = $state(false)
 	let error = $state('')
@@ -24,9 +25,10 @@
 		if (!$session || !rkey) return
 
 		try {
-			const schema = await clayprotoSDK.getSchema(rkey)
+			const schema = (await clay.getRecord(SCHEMA, rkey)) as Schema
 			name = schema.name
 			fields = schema.fields
+			createdAt = schema.createdAt
 		} catch (err) {
 			error = (err as Error).message
 		} finally {
@@ -51,9 +53,11 @@
 		submitting = true
 
 		try {
-			await clayprotoSDK.updateSchema(rkey, {
+			await clay.putRecord(SCHEMA, rkey, {
+				$type: SCHEMA,
 				name,
-				fields
+				fields,
+				createdAt
 			})
 			goto(`/schemas/${rkey}`)
 		} catch (err) {

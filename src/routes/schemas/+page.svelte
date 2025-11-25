@@ -2,9 +2,9 @@
 	import {onMount} from 'svelte'
 	import {goto} from '$app/navigation'
 	import {session} from '$lib/session'
-	import {clayprotoSDK, type SchemaDefinition} from '$lib/clayproto-sdk'
+	import {clay, SCHEMA, type Schema} from '$lib/clayproto'
 
-	let schemas = $state<{rkey: string; schema: SchemaDefinition}[]>([])
+	let schemas = $state<{rkey: string; schema: Schema}[]>([])
 	let loading = $state(true)
 	let error = $state('')
 
@@ -15,7 +15,8 @@
 		}
 
 		try {
-			schemas = await clayprotoSDK.listSchemas()
+			const records = await clay.listRecords(SCHEMA)
+			schemas = records.map((r) => ({rkey: r.rkey, schema: r.value as Schema}))
 		} catch (err) {
 			error = (err as Error).message
 		} finally {

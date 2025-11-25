@@ -1,5 +1,5 @@
 {
-	"client_id": "https://clayproto.0skar.workers.dev/client-metadata.json",
+	"client_id": "https://clayproto.0skar.workers.dev/oauth-client-metadata.json",
 	"client_name": "clayproto",
 	"client_uri": "https://clayproto.0skar.workers.dev",
 	"redirect_uris": ["https://clayproto.0skar.workers.dev/"],

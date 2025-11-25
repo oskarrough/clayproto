@@ -2,13 +2,13 @@
 	import {onMount} from 'svelte'
 	import {goto} from '$app/navigation'
 	import {session} from '$lib/session'
-	import {clayprotoSDK, type SchemaDefinition, type ItemData} from '$lib/clayproto-sdk'
+	import {clay, SCHEMA, ITEM, type Schema, type Item} from '$lib/clayproto'
 	import DynamicForm from '$lib/components/dynamic-form.svelte'
 
 	const {params} = $props()
 
-	let schema = $state<SchemaDefinition | null>(null)
-	let item = $state<ItemData | null>(null)
+	let schema = $state<Schema | null>(null)
+	let item = $state<Item | null>(null)
 	let loading = $state(true)
 	let submitting = $state(false)
 	let deleting = $state(false)
@@ -29,8 +29,8 @@
 		if (!rkey || !itemRkey) return
 
 		try {
-			schema = await clayprotoSDK.getSchema(rkey)
-			item = await clayprotoSDK.getItem(itemRkey)
+			schema = (await clay.getRecord(SCHEMA, rkey)) as Schema
+			item = (await clay.getRecord(ITEM, itemRkey)) as Item
 		} catch (err) {
 			error = (err as Error).message
 		} finally {
@@ -47,7 +47,12 @@
 		submitting = true
 
 		try {
-			await clayprotoSDK.updateItem(itemRkey, schemaRkey, dynamicForm.formData)
+			await clay.putRecord(ITEM, itemRkey, {
+				$type: ITEM,
+				schema: schemaRkey,
+				data: dynamicForm.formData,
+				createdAt: item.createdAt
+			})
 			goto(`/schemas/${schemaRkey}`)
 		} catch (err) {
 			error = (err as Error).message
@@ -61,7 +66,7 @@
 
 		deleting = true
 		try {
-			await clayprotoSDK.deleteItem(itemRkey)
+			await clay.deleteRecord(ITEM, itemRkey)
 			goto(`/schemas/${rkey}`)
 		} catch (err) {
 			error = (err as Error).message
