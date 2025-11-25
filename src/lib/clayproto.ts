@@ -176,7 +176,6 @@ export class ClayProto {
 
 			const {rkey} = await clayprotoSDK.createSchema({
 				name,
-				description: `Schema for ${name}`,
 				fields
 			})
 

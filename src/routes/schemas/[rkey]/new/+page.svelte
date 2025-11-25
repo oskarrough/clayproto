@@ -58,18 +58,18 @@
 	<main>
 		<p>@{$session?.handle}/</p>
 		<main>
-			<p>└─ <a href="/schemas">schemas/</a></p>
+			<p><span mono>└─</span> <a href="/schemas">schemas/</a></p>
 			<main>
 				{#if loading}
 					<p><em>loading...</em></p>
 				{:else if error && !schema}
 					<p><strong>! {error}</strong></p>
 				{:else if schema}
-					<p>└─ <a href="/schemas/{params.rkey}">{schema.name}/</a></p>
+					<p><span mono>└─</span> <a href="/schemas/{params.rkey}">{schema.name}/</a></p>
 					<main>
-						<p>└─ items/</p>
+						<p><span mono>└─</span> items/</p>
 						<main>
-							<p>└─ + new item/</p>
+							<p><span mono>└─</span>+/</p>
 							<main>
 								{#if error}
 									<p><strong>! {error}</strong></p>
@@ -78,7 +78,7 @@
 									<DynamicForm
 										bind:this={dynamicForm}
 										fields={schema.fields}
-										submitLabel={submitting ? 'creating...' : 'create'}
+										submitLabel={submitting ? 'saving...' : 'save'}
 									/>
 								</form>
 							</main>

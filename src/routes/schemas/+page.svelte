@@ -29,7 +29,7 @@
 	<main>
 		<p>@{$session?.handle}/</p>
 		<main>
-			<p>└─ schemas/</p>
+			<p><span mono>├─</span> schemas/</p>
 			<main>
 				{#if loading}
 					<p><em>loading...</em></p>
@@ -41,11 +41,11 @@
 					{:else}
 						{#each schemas as { rkey, schema } (rkey)}
 							<p>
-								├─ <a href="/schemas/{rkey}">{schema.name || `(${rkey})`}/</a>
+								<span mono>├─</span> <a href="/schemas/{rkey}">{schema.name || `(${rkey})`}/</a>
 							</p>
 						{/each}
 					{/if}
-					<p>└─ <a href="/schemas/new">+ new schema</a></p>
+					<p><span mono>└─</span> <a href="/schemas/new">+</a></p>
 				{/if}
 			</main>
 		</main>

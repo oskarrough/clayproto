@@ -8,7 +8,6 @@
 	const uid = $props.id()
 
 	let name = $state('')
-	let description = $state('')
 	let fields = $state<SchemaField[]>([])
 	let submitting = $state(false)
 	let error = $state('')
@@ -16,23 +15,19 @@
 	// Preserve form data across navigation
 	interface FormSnapshot {
 		name: string
-		description: string
 		fields: SchemaField[]
 	}
 
 	export const snapshot: Snapshot<FormSnapshot> = {
-		capture: () => ({name, description, fields}),
+		capture: () => ({name, fields}),
 		restore: (value) => {
 			name = value.name
-			description = value.description
 			fields = value.fields
 		}
 	}
 
 	onMount(() => {
-		if (!$session) {
-			goto('/')
-		}
+		if (!$session) goto('/')
 	})
 
 	function addField() {
@@ -53,7 +48,6 @@
 		try {
 			await clayprotoSDK.createSchema({
 				name,
-				description: description || undefined,
 				fields
 			})
 			goto('/schemas')
@@ -69,16 +63,17 @@
 	<main>
 		<p>@{$session?.handle}/</p>
 		<main>
-			<p>└─ <a href="/schemas">schemas/</a></p>
+			<p><span mono>└─</span> <a href="/schemas">schemas/</a></p>
 			<main>
-				<p>└─ + new schema/</p>
+				<!-- <p><span mono>└─</span>+creating new schema/</p> -->
 				<main>
 					{#if error}
 						<p><strong>! {error}</strong></p>
 					{/if}
 					<form onsubmit={handleSubmit}>
 						<p>
-							├─ name: <input
+							<span mono>├─</span> name:
+							<input
 								type="text"
 								id="{uid}-name"
 								bind:value={name}
@@ -87,18 +82,12 @@
 								required
 							/>
 						</p>
-						<p>
-							├─ description: <textarea
-								id="{uid}-description"
-								bind:value={description}
-								disabled={submitting}
-							></textarea>
-						</p>
-						<p>├─ fields/</p>
+						<p><span mono>├─</span> fields/</p>
 						<main>
 							{#each fields as field, i (i)}
 								<p>
-									├─ <input
+									<span mono>├─</span>
+									<input
 										type="text"
 										bind:value={field.name}
 										placeholder="name"
@@ -128,19 +117,19 @@
 										data-text
 										type="button"
 										onclick={() => removeField(i)}
-										disabled={submitting}>delete field</button
+										disabled={submitting}>×</button
 									>
 								</p>
 							{/each}
 							<p>
-								└─ <button data-text type="button" onclick={addField} disabled={submitting}
-									>+ add field</button
-								>
+								<span mono>└─</span>
+								<button data-text type="button" onclick={addField} disabled={submitting}>+</button>
 							</p>
 						</main>
 						<p>
-							└─ <button type="submit" disabled={submitting}>
-								{#if submitting}<em>creating...</em>{:else}create{/if}
+							<span mono>└─</span>
+							<button type="submit" disabled={submitting}>
+								{#if submitting}<em>creating...</em>{:else}save{/if}
 							</button>
 						</p>
 					</form>

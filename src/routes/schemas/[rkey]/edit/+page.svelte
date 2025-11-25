@@ -8,7 +8,6 @@
 	const uid = $props.id()
 
 	let name = $state('')
-	let description = $state('')
 	let fields = $state<SchemaField[]>([])
 	let loading = $state(true)
 	let submitting = $state(false)
@@ -27,7 +26,6 @@
 		try {
 			const schema = await clayprotoSDK.getSchema(rkey)
 			name = schema.name
-			description = schema.description || ''
 			fields = schema.fields
 		} catch (err) {
 			error = (err as Error).message
@@ -55,7 +53,6 @@
 		try {
 			await clayprotoSDK.updateSchema(rkey, {
 				name,
-				description: description || undefined,
 				fields
 			})
 			goto(`/schemas/${rkey}`)
@@ -71,21 +68,22 @@
 	<main>
 		<p>@{$session?.handle}/</p>
 		<main>
-			<p>└─ <a href="/schemas">schemas/</a></p>
+			<p><span mono>└─</span> <a href="/schemas">schemas/</a></p>
 			<main>
 				{#if loading}
 					<p><em>loading...</em></p>
 				{:else}
-					<p>└─ <a href="/schemas/{$page.params.rkey}">{name || '...'}/</a></p>
+					<p><span mono>└─</span> <a href="/schemas/{$page.params.rkey}">{name || '...'}/</a></p>
 					<main>
-						<p>└─ edit/</p>
+						<!-- <p><span mono>└─</span> edit/</p> -->
 						<main>
 							{#if error}
 								<p><strong>! {error}</strong></p>
 							{/if}
 							<form onsubmit={handleSubmit}>
 								<p>
-									├─ name: <input
+									<span mono>├─</span> name:
+									<input
 										type="text"
 										id="{uid}-name"
 										bind:value={name}
@@ -94,18 +92,12 @@
 										required
 									/>
 								</p>
-								<p>
-									├─ description: <textarea
-										id="{uid}-description"
-										bind:value={description}
-										disabled={submitting}
-									></textarea>
-								</p>
-								<p>├─ fields/</p>
+								<p><span mono>├─</span> fields/</p>
 								<main>
 									{#each fields as field, i (i)}
 										<p>
-											├─ <input
+											<span mono>├─</span>
+											<input
 												type="text"
 												bind:value={field.name}
 												placeholder="name"
@@ -144,13 +136,15 @@
 										</p>
 									{/each}
 									<p>
-										└─ <button data-text type="button" onclick={addField} disabled={submitting}
+										<span mono>└─</span>
+										<button data-text type="button" onclick={addField} disabled={submitting}
 											>+ add field</button
 										>
 									</p>
 								</main>
 								<p>
-									└─ <button type="submit" disabled={submitting}>
+									<span mono>└─</span>
+									<button type="submit" disabled={submitting}>
 										{#if submitting}<em>saving...</em>{:else}save{/if}
 									</button>
 								</p>

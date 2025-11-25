@@ -1,6 +1,6 @@
 # clayproto
 
-Clayproto explores the good 'ol views (queries) plus data model (schema) but on top of AT Protocol.
+Clayproto is a meta-layer over AT Protocol that explores the good 'ol views (queries) plus data model (schema).
 
 Since we can store any data on atproto, and it's easy to authenticate using centralized Bluesky PDS,
 clayproto explores how we can enable people to maintain collections of data on atproto by reusing a simple schema.

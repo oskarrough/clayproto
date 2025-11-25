@@ -41,7 +41,6 @@ class AtprotoOAuthService {
 
 	async signIn(handle: string): Promise<void> {
 		if (!this.client) throw new Error('OAuth client not initialized')
-
 		await this.client.signIn(handle, {
 			state: window.location.pathname
 		})
@@ -95,7 +94,7 @@ class AtprotoOAuthService {
 
 export const atprotoOAuth = new AtprotoOAuthService()
 
-// Scopes for clayproto - identity + schema/item CRUD
+/** Scopes for clayproto - identity + schema/item CRUD */
 const scopes = [
 	'atproto',
 	'repo:app.clayproto.schema?action=create',
@@ -106,7 +105,7 @@ const scopes = [
 	'repo:app.clayproto.item?action=delete'
 ].join(' ')
 
-// Helper to build client ID for dev vs prod
+/** Helper to build client ID for dev vs prod */
 export function buildClientId(): string {
 	if (window.location.protocol === 'http:') {
 		// Loopback client for local dev - must use 127.0.0.1, not localhost

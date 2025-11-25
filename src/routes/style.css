@@ -1,6 +1,18 @@
+:root {
+	--font-mono: 'IBM Plex Mono', monospace;
+}
+
 html {
 	scrollbar-gutter: stable;
 	font-family: 'Inter', sans-serif;
+	font-size: 20px;
+	font-optical-sizing: auto;
+	font-style: normal;
+	line-height: 1;
+}
+
+[mono] {
+	font-family: var(--font-mono);
 }
 
 :where(audio, iframe, img, svg, video) {
@@ -54,18 +66,30 @@ nav nav {
 	margin-inline-start: 1rem;
 }
 
-button[data-text] {
+button[data-text],
+button[type='submit'] {
 	all: unset;
 }
 
 a,
-button[data-text] {
-	color: inherit;
+button[data-text],
+button[type='submit'] {
+	color: blue;
 	text-decoration: none;
-	border: 1px solid;
+	/*border: 1px solid;*/
 }
 
 em {
-	font-family: 'IBM Plex Mono', monospace;
+	font-family: var(--mono);
 	font-style: normal;
+}
+
+input[type='text'],
+select {
+	padding: 0;
+	border: 0;
+}
+
+p {
+	background: #eee;
 }

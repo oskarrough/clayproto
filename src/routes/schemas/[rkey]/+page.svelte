@@ -38,7 +38,7 @@
 
 		try {
 			schema = await clayprotoSDK.getSchema(rkey)
-			items = await clayprotoSDK.listItemsBySchema(schema.name)
+			items = await clayprotoSDK.listItemsBySchema(rkey)
 		} catch (err) {
 			error = (err as Error).message
 		} finally {
@@ -52,7 +52,7 @@
 	<main>
 		<p>@{$session?.handle}/</p>
 		<main>
-			<p>└─ <a href="/schemas">schemas/</a></p>
+			<p><span mono>└─</span> <a href="/schemas">schemas/</a></p>
 			<main>
 				{#if loading}
 					<p><em>loading...</em></p>
@@ -60,53 +60,27 @@
 					<p><strong>! {error}</strong></p>
 				{:else if schema}
 					<p>
-						└─ {schema.name}/ <a href="/schemas/{$page.params.rkey}/edit">edit</a>
+						<span mono>└─</span>
+						{schema.name}/ <a href="/schemas/{$page.params.rkey}/edit">✎</a>
 						<button data-text onclick={handleDelete} disabled={deleting}
-							>{#if deleting}<em>deleting...</em>{:else}delete{/if}</button
+							>{#if deleting}<em>…</em>{:else}×{/if}</button
 						>
-						{#if schema.description}<em>{schema.description}</em>{/if}
 					</p>
 					<main>
-						<p>
-							├─ fields/{#if schema.fields.length > 0}
-								({schema.fields.length}){:else}
-								<em>(empty)</em>{/if}
-						</p>
-						{#if schema.fields.length > 0}
-							<main>
-								{#each schema.fields as field, i (field.name)}
-									<p>
-										{i === schema.fields.length - 1 ? '└─' : '├─'}
-										<strong>{field.name}</strong>
-										<em
-											>{field.type}{field.items ? `<${field.items}>` : ''}{field.required
-												? ' *'
-												: ''}</em
-										>
-									</p>
-								{/each}
-							</main>
-						{/if}
-						<p>
-							└─ items/{#if items.length > 0}
-								({items.length}){:else}
-								<em>(empty)</em>{/if}
-						</p>
-						<main>
-							{#each items as { rkey: itemRkey, item } (itemRkey)}
-								{@const preview = schema.fields
-									.slice(0, 2)
-									.map((f) => item.data[f.name])
-									.filter(Boolean)
-									.join(' ')}
-								<p>
-									├─ <a href="/schemas/{$page.params.rkey}/items/{itemRkey}/edit"
-										>{preview || itemRkey}</a
-									>
-								</p>
-							{/each}
-							<p>└─ <a href="/schemas/{$page.params.rkey}/new">+ new item</a></p>
-						</main>
+						{#each items as { rkey: itemRkey, item }, i (itemRkey)}
+							{@const preview = schema.fields
+								.slice(0, 2)
+								.map((f) => item.data[f.name])
+								.filter(Boolean)
+								.join(' ')}
+							<p>
+								<span mono>{i === items.length - 1 && items.length > 0 ? '├─' : '├─'}</span>
+								<a href="/schemas/{$page.params.rkey}/items/{itemRkey}/edit"
+									>{preview || itemRkey}</a
+								>
+							</p>
+						{/each}
+						<p><span mono>└─</span> <a href="/schemas/{$page.params.rkey}/new">+</a></p>
 					</main>
 				{/if}
 			</main>

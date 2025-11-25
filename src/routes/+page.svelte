@@ -32,15 +32,18 @@
 		<main>
 			<p>@{$session.handle}/</p>
 			<main>
-				<p>├─ <a href="/schemas">schemas/</a></p>
-				<p>└─ <button data-text type="button" onclick={signOut}>logout</button></p>
+				<p><span mono>├─</span> <a href="/schemas">schemas/</a></p>
+				<p>
+					<span mono>└─</span> <button data-text type="button" onclick={signOut}>logout</button>
+				</p>
 			</main>
 		</main>
 	{:else}
 		<main>
 			<form onsubmit={signIn}>
 				<p>
-					└─ <input
+					<span mono>└─</span>
+					<input
 						type="text"
 						bind:value={handle}
 						placeholder="you.bsky.social"

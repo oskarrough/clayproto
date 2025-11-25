@@ -13,7 +13,7 @@
 	const uid = $props.id()
 	const defaults: Record<string, unknown> = {boolean: false, array: [], string: '', number: ''}
 
-	let formData = $derived(
+	let formData = $state(
 		Object.fromEntries(fields.map((f) => [f.name, values[f.name] ?? defaults[f.type] ?? '']))
 	)
 
@@ -29,8 +29,8 @@
 
 {#each fields as field, i (field.name)}
 	<p>
-		{i === fields.length - 1 && !submitLabel ? '└─' : '├─'}
-		{field.name}{#if field.required}*{/if}:
+		<span mono>{i === fields.length - 1 && !submitLabel ? '└─' : '├─'}</span>
+		{field.name}{#if field.required}*{/if}
 		{#if field.type === 'string'}
 			<input
 				type="text"
@@ -72,7 +72,7 @@
 					<button
 						data-text
 						type="button"
-						onclick={() => updateArray(field.name, (arr) => arr.toSpliced(j, 1))}>x</button
+						onclick={() => updateArray(field.name, (arr) => arr.toSpliced(j, 1))}>×</button
 					>
 				</p>
 			{/each}
@@ -80,15 +80,13 @@
 				└─ <button
 					data-text
 					type="button"
-					onclick={() => updateArray(field.name, (arr) => [...arr, ''])}
+					onclick={() => updateArray(field.name, (arr) => [...arr, ''])}>+</button
 				>
-					+ add
-				</button>
 			</p>
 		</main>
 	{/if}
 {/each}
 
 {#if submitLabel}
-	<p>└─ <button type="submit">{submitLabel}</button></p>
+	<p><span class="mono">└─</span> <button type="submit">{submitLabel}</button></p>
 {/if}
