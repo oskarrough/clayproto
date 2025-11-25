@@ -1,10 +1,11 @@
 <script lang="ts">
 	import {onMount} from 'svelte'
 	import {goto} from '$app/navigation'
-	import {page} from '$app/stores'
 	import {session} from '$lib/session'
 	import {clayprotoSDK, type SchemaDefinition} from '$lib/clayproto-sdk'
 	import DynamicForm from '$lib/components/dynamic-form.svelte'
+
+	const {params} = $props()
 
 	let schema = $state<SchemaDefinition | null>(null)
 	let loading = $state(true)
@@ -22,7 +23,7 @@
 	onMount(async () => {
 		if (!$session) return
 
-		const rkey = $page.params.rkey
+		const {rkey} = params
 		if (!rkey) return
 
 		try {
@@ -38,12 +39,13 @@
 		e.preventDefault()
 		if (!schema || !dynamicForm?.formData) return
 
+		const {rkey: schemaRkey} = params
 		error = ''
 		submitting = true
 
 		try {
-			await clayprotoSDK.createItem(schema.name, dynamicForm.formData)
-			goto(`/schemas/${$page.params.rkey}`)
+			await clayprotoSDK.createItem(schemaRkey, dynamicForm.formData)
+			goto(`/schemas/${schemaRkey}`)
 		} catch (err) {
 			error = (err as Error).message
 			submitting = false
@@ -63,7 +65,7 @@
 				{:else if error && !schema}
 					<p><strong>! {error}</strong></p>
 				{:else if schema}
-					<p>└─ <a href="/schemas/{$page.params.rkey}">{schema.name}/</a></p>
+					<p>└─ <a href="/schemas/{params.rkey}">{schema.name}/</a></p>
 					<main>
 						<p>└─ items/</p>
 						<main>

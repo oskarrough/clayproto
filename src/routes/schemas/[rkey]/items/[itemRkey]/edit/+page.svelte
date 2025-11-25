@@ -1,10 +1,11 @@
 <script lang="ts">
 	import {onMount} from 'svelte'
 	import {goto} from '$app/navigation'
-	import {page} from '$app/stores'
 	import {session} from '$lib/session'
 	import {clayprotoSDK, type SchemaDefinition, type ItemData} from '$lib/clayproto-sdk'
 	import DynamicForm from '$lib/components/dynamic-form.svelte'
+
+	const {params} = $props()
 
 	let schema = $state<SchemaDefinition | null>(null)
 	let item = $state<ItemData | null>(null)
@@ -24,7 +25,7 @@
 	onMount(async () => {
 		if (!$session) return
 
-		const {rkey, itemRkey} = $page.params
+		const {rkey, itemRkey} = params
 		if (!rkey || !itemRkey) return
 
 		try {
@@ -39,15 +40,15 @@
 
 	async function handleSubmit(e: SubmitEvent) {
 		e.preventDefault()
-		const {rkey, itemRkey} = $page.params
-		if (!rkey || !itemRkey || !schema || !item || !dynamicForm?.formData) return
+		const {rkey: schemaRkey, itemRkey} = params
+		if (!schemaRkey || !itemRkey || !schema || !item || !dynamicForm?.formData) return
 
 		error = ''
 		submitting = true
 
 		try {
-			await clayprotoSDK.updateItem(itemRkey, schema.name, dynamicForm.formData)
-			goto(`/schemas/${rkey}`)
+			await clayprotoSDK.updateItem(itemRkey, schemaRkey, dynamicForm.formData)
+			goto(`/schemas/${schemaRkey}`)
 		} catch (err) {
 			error = (err as Error).message
 			submitting = false
@@ -55,7 +56,7 @@
 	}
 
 	async function handleDelete() {
-		const {rkey, itemRkey} = $page.params
+		const {rkey, itemRkey} = params
 		if (!rkey || !itemRkey || !confirm('Delete this item? This cannot be undone.')) return
 
 		deleting = true
@@ -81,7 +82,7 @@
 				{:else if error && !schema}
 					<p><strong>! {error}</strong></p>
 				{:else if schema && item}
-					<p>└─ <a href="/schemas/{$page.params.rkey}">{schema.name}/</a></p>
+					<p>└─ <a href="/schemas/{params.rkey}">{schema.name}/</a></p>
 					<main>
 						<p>└─ items/</p>
 						<main>
@@ -90,7 +91,7 @@
 									.slice(0, 2)
 									.map((f) => item?.data[f.name])
 									.filter(Boolean)
-									.join(' ') || $page.params.itemRkey}/
+									.join(' ') || params.itemRkey}/
 								<button data-text onclick={handleDelete} disabled={deleting}
 									>{#if deleting}<em>deleting...</em>{:else}delete{/if}</button
 								>

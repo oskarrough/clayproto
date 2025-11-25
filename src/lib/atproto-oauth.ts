@@ -109,9 +109,9 @@ const scopes = [
 // Helper to build client ID for dev vs prod
 export function buildClientId(): string {
 	if (window.location.protocol === 'http:') {
-		// Loopback client for local dev - must use root path only
+		// Loopback client for local dev - must use 127.0.0.1, not localhost
 		const loc = {
-			hostname: window.location.hostname,
+			hostname: '127.0.0.1',
 			pathname: '/',
 			port: window.location.port
 		}

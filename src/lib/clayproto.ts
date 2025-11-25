@@ -1,15 +1,9 @@
-/**
- * ClayProto - High-level SDK for ATProto
- *
- * An elegant, Rails-like API for building single-prompt apps on ATProto.
- * Wraps the low-level SDK with schema builders, validation, and relations.
- */
+// ClayProto - High-level SDK for ATProto
+// Wraps the low-level SDK with schema builders, validation, and relations.
 
 import {clayprotoSDK, type SchemaField} from './clayproto-sdk'
 
-// ============================================================================
-// TYPES
-// ============================================================================
+// Types
 
 export interface FieldConfig {
 	required?: boolean
@@ -49,9 +43,7 @@ export interface QueryOptions {
 	include?: Record<string, boolean>
 }
 
-// ============================================================================
-// FIELD BUILDERS
-// ============================================================================
+// Field builders
 
 const field = (
 	type: FieldBuilder['_type'],
@@ -71,13 +63,8 @@ export const ref = (schema: string, config: Omit<RefConfig, 'schema'> = {}) =>
 export const array = (items: FieldBuilder, config: Omit<ArrayConfig, 'items'> = {}) =>
 	field('array', {...config, items} as ArrayConfig)
 
-// ============================================================================
-// SCHEMA REGISTRY
-// ============================================================================
+// Schema registry
 
-/**
- * Internal registry of defined schemas
- */
 class SchemaRegistry {
 	private schemas: Map<string, {builder: SchemaBuilder; rkey?: string}> = new Map()
 
@@ -102,9 +89,7 @@ class SchemaRegistry {
 	}
 }
 
-// ============================================================================
-// VALIDATION
-// ============================================================================
+// Validation
 
 const typeChecks: Record<string, (v: unknown) => string | null> = {
 	string: (v) => (typeof v === 'string' ? null : 'Must be a string'),
@@ -152,9 +137,6 @@ export function validate<S extends SchemaBuilder>(
 	return {valid: errors.length === 0, errors}
 }
 
-/**
- * Converts a FieldBuilder to a SchemaField for the low-level SDK
- */
 function fieldBuilderToSchemaField(name: string, builder: FieldBuilder): SchemaField {
 	const field: SchemaField = {
 		name,
@@ -171,10 +153,6 @@ function fieldBuilderToSchemaField(name: string, builder: FieldBuilder): SchemaF
 	return field
 }
 
-// ============================================================================
-// CLAYPROTO CLASS
-// ============================================================================
-
 export class ClayProto {
 	private registry = new SchemaRegistry()
 	private itemCache = new Map<string, Map<string, unknown>>()
@@ -188,38 +166,27 @@ export class ClayProto {
 		return clayprotoSDK.did
 	}
 
-	/**
-	 * Define a collection of schemas
-	 */
 	async defineSchemas(schemas: Record<string, SchemaBuilder>): Promise<Record<string, string>> {
 		const rkeys: Record<string, string> = {}
 
 		for (const [name, builder] of Object.entries(schemas)) {
-			// Convert builder to SchemaDefinition
 			const fields: SchemaField[] = Object.entries(builder).map(([fieldName, fieldBuilder]) =>
 				fieldBuilderToSchemaField(fieldName, fieldBuilder)
 			)
 
-			const schemaDefinition = {
+			const {rkey} = await clayprotoSDK.createSchema({
 				name,
 				description: `Schema for ${name}`,
 				fields
-			}
+			})
 
-			// Create schema in PDS
-			const {rkey} = await clayprotoSDK.createSchema(schemaDefinition)
 			rkeys[name] = rkey
-
-			// Register in local registry
 			this.registry.register(name, builder, rkey)
 		}
 
 		return rkeys
 	}
 
-	/**
-	 * Load existing schemas from PDS
-	 */
 	async loadSchemas() {
 		const fieldBuilders: Record<string, (required?: boolean) => FieldBuilder> = {
 			string: (r) => string({required: r}),
@@ -237,9 +204,6 @@ export class ClayProto {
 		}
 	}
 
-	/**
-	 * Create a new item
-	 */
 	async create(
 		schemaName: string,
 		data: Record<string, unknown>
@@ -249,7 +213,6 @@ export class ClayProto {
 			throw new Error(`Schema "${schemaName}" not found. Did you call defineSchemas()?`)
 		}
 
-		// Apply defaults
 		const finalData: Record<string, unknown> = {...data}
 		for (const [fieldName, fieldBuilder] of Object.entries(schema.builder)) {
 			if (finalData[fieldName] === undefined && fieldBuilder._config.default !== undefined) {
@@ -257,13 +220,11 @@ export class ClayProto {
 			}
 		}
 
-		// Validate
 		const validation = validate(schema.builder, finalData as Record<string, unknown>)
 		if (!validation.valid) {
 			throw new ValidationError('Validation failed', validation.errors)
 		}
 
-		// Create in PDS
 		const {rkey, record} = await clayprotoSDK.createItem(
 			schemaName,
 			finalData as Record<string, unknown>
@@ -273,9 +234,6 @@ export class ClayProto {
 		return {rkey, data: finalData}
 	}
 
-	/**
-	 * Get a single item by rkey
-	 */
 	async get(
 		schemaName: string,
 		rkey: string,
@@ -299,9 +257,6 @@ export class ClayProto {
 		> & {_rkey: string}
 	}
 
-	/**
-	 * Query items with filtering and ordering
-	 */
 	async query(
 		schemaName: string,
 		options: QueryOptions = {}
@@ -311,15 +266,12 @@ export class ClayProto {
 			throw new Error(`Schema "${schemaName}" not found`)
 		}
 
-		// Fetch all items from PDS
 		const items = await clayprotoSDK.listItems()
 
-		// Filter by schema
 		let results: Record<string, unknown>[] = items
 			.filter((item) => item.item.schema === schemaName)
 			.map((item) => ({...item.item.data, _rkey: item.rkey}))
 
-		// Apply where clause
 		if (options.where) {
 			if (typeof options.where === 'function') {
 				results = results.filter(options.where as (item: unknown) => boolean)
@@ -332,7 +284,6 @@ export class ClayProto {
 			}
 		}
 
-		// Apply ordering
 		if (options.orderBy) {
 			const [[field, direction]] = Object.entries(options.orderBy)
 			results.sort((a, b) => {
@@ -343,12 +294,10 @@ export class ClayProto {
 			})
 		}
 
-		// Apply limit
 		if (options.limit) {
 			results = results.slice(0, options.limit)
 		}
 
-		// Resolve relations
 		const resolved = await Promise.all(
 			results.map((item) => this.resolveRelations(schemaName, item, options.include))
 		)
@@ -356,9 +305,6 @@ export class ClayProto {
 		return resolved as (Record<string, unknown> & {_rkey: string})[]
 	}
 
-	/**
-	 * Update an item
-	 */
 	async update(
 		schemaName: string,
 		rkey: string,
@@ -369,24 +315,20 @@ export class ClayProto {
 			throw new Error(`Schema "${schemaName}" not found`)
 		}
 
-		// Get existing data
 		const existing = await this.get(schemaName, rkey)
 		if (!existing) {
 			throw new Error(`Item not found: ${rkey}`)
 		}
 
-		// Merge with updates, stripping _rkey which was added during retrieval
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const {_rkey, ...existingData} = existing
+		const {_rkey: _, ...existingData} = existing
 		const updateData = {...existingData, ...data}
 
-		// Validate
 		const validation = validate(schema.builder, updateData as Record<string, unknown>)
 		if (!validation.valid) {
 			throw new ValidationError('Validation failed', validation.errors)
 		}
 
-		// Update in PDS
 		await clayprotoSDK.updateItem(rkey, schemaName, updateData as Record<string, unknown>)
 
 		this.cache(schemaName).set(rkey, {...updateData, _rkey: rkey})
@@ -398,9 +340,6 @@ export class ClayProto {
 		this.cache(schemaName).delete(rkey)
 	}
 
-	/**
-	 * Resolve references in an item
-	 */
 	private async resolveRelations(
 		schemaName: string,
 		item: Record<string, unknown>,
@@ -433,17 +372,10 @@ export class ClayProto {
 		return resolved
 	}
 
-	/**
-	 * List all defined schemas
-	 */
 	listSchemas() {
 		return this.registry.all()
 	}
 }
-
-// ============================================================================
-// CUSTOM ERROR CLASSES
-// ============================================================================
 
 export class ValidationError extends Error {
 	constructor(
@@ -454,10 +386,6 @@ export class ValidationError extends Error {
 		this.name = 'ValidationError'
 	}
 }
-
-// ============================================================================
-// EXPORTS
-// ============================================================================
 
 export const clay = {
 	string,

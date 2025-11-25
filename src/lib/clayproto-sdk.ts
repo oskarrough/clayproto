@@ -16,7 +16,6 @@ export interface SchemaField {
 export interface SchemaDefinition {
 	$type: typeof schemaCollection
 	name: string
-	description?: string
 	fields: SchemaField[]
 	createdAt: string
 }
@@ -112,10 +111,10 @@ export const clayprotoSDK = {
 	},
 
 	// Item CRUD
-	async createItem(schema: string, data: Record<string, unknown>) {
+	async createItem(schemaRkey: string, data: Record<string, unknown>) {
 		const record: ItemData = {
 			$type: itemCollection,
-			schema,
+			schema: schemaRkey,
 			data,
 			createdAt: new Date().toISOString()
 		}
@@ -153,11 +152,11 @@ export const clayprotoSDK = {
 		return items.filter((i) => i.item.schema === schema)
 	},
 
-	async updateItem(rkey: string, schema: string, data: Record<string, unknown>) {
+	async updateItem(rkey: string, schemaRkey: string, data: Record<string, unknown>) {
 		const existing = await this.getItem(rkey)
 		const record: ItemData = {
 			$type: itemCollection,
-			schema,
+			schema: schemaRkey,
 			data,
 			createdAt: existing.createdAt
 		}

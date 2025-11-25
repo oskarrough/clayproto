@@ -1,8 +1,9 @@
 {
+	"client_id": "https://clayproto.0skar.workers.dev/client-metadata.json",
 	"client_name": "clayproto",
-	"client_uri": "https://clayproto.pages.dev",
-	"redirect_uris": ["https://clayproto.pages.dev/"],
-	"scope": "atproto transition:generic",
+	"client_uri": "https://clayproto.0skar.workers.dev",
+	"redirect_uris": ["https://clayproto.0skar.workers.dev/"],
+	"scope": "atproto repo:app.clayproto.schema?action=create repo:app.clayproto.schema?action=update repo:app.clayproto.schema?action=delete repo:app.clayproto.item?action=create repo:app.clayproto.item?action=update repo:app.clayproto.item?action=delete",
 	"grant_types": ["authorization_code", "refresh_token"],
 	"response_types": ["code"],
 	"application_type": "web",

@@ -8,11 +8,11 @@
 			"description": "User data item following a custom schema",
 			"record": {
 				"type": "object",
-				"required": ["schemaType", "data", "createdAt"],
+				"required": ["schema", "data", "createdAt"],
 				"properties": {
-					"schemaType": {
+					"schema": {
 						"type": "string",
-						"description": "NSID of the schema this item follows"
+						"description": "Rkey of the schema this item follows"
 					},
 					"data": {
 						"type": "unknown",

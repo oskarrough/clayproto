@@ -8,21 +8,12 @@
 			"description": "Schema definition for custom data models",
 			"record": {
 				"type": "object",
-				"required": ["nsid", "title", "fields", "createdAt"],
+				"required": ["name", "fields", "createdAt"],
 				"properties": {
-					"nsid": {
-						"type": "string",
-						"description": "Namespace identifier for this schema (e.g., clay.music.track)"
-					},
-					"title": {
+					"name": {
 						"type": "string",
 						"maxGraphemes": 100,
-						"description": "Human-readable title for this schema"
-					},
-					"description": {
-						"type": "string",
-						"maxGraphemes": 500,
-						"description": "Optional description of what this schema represents"
+						"description": "Name for this schema"
 					},
 					"fields": {
 						"type": "array",
