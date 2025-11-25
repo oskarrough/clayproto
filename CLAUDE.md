@@ -1,4 +1,4 @@
-##  LLM instructions for working on clayproto
+## LLM instructions for working on clayproto
 
 ## General workflow
 

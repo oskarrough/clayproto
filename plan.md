@@ -7,7 +7,6 @@ Minimal, malleable POC. Single routes for each purpose:
 
 ## Backlog
 
-- Clean up ./examples/
 - Figure out what's next
 
 ## RESOURCES
