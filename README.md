@@ -1,38 +1,15 @@
-# sv
+# clayproto
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+Clayproto explores the good 'ol views (queries) plus data model (schema) but on top of AT Protocol.
 
-## Creating a project
+Since we can store any data on atproto, and it's easy to authenticate using centralized Bluesky PDS,
+clayproto explores how we can enable people to maintain collections of data on atproto by reusing a simple schema.
 
-If you're seeing this, you've probably already done this step. Congrats!
+The idea is that you authenticate with clayproto, which gives you permission to CRUD two new records: 
+	app.clayproto.schema
+	app.clayproto.item 
+	
+Once you've created a app.clayproto.schema and defined its fields,
+you can create as many items as you wish in this collection.
 
-```sh
-# create a new project in the current directory
-npx sv create
-
-# create a new project in my-app
-npx sv create my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```sh
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+All data is stored in your user's personal repository on atproto.
