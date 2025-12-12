@@ -3,7 +3,7 @@
 	import {session, refreshSession} from '$lib/session'
 	import {atprotoOAuth} from '$lib/atproto-oauth'
 
-	let handle = $state(dev ? 'oskarrough.bsky.social' : '')
+	let handle = $state(dev ? 'username.bsky.social' : '')
 	let signingIn = $state(false)
 	let error = $state('')
 
