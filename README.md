@@ -2,6 +2,8 @@
 
 user-defined schemas on ATProto. your data, your structure, your server.
 
+> this is just a prototype
+
 ## the problem
 
 ATProto gives you a personal data server. in theory, your data is portable and yours. in practice, you only get to store what apps define — Bluesky stores posts, likes, follows. what about everything else? your reading list, recipes, project notes, workout logs?
