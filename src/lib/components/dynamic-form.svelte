@@ -13,9 +13,13 @@
 	const uid = $props.id()
 	const defaults: Record<string, unknown> = {boolean: false, array: [], string: '', number: ''}
 
-	let formData = $state(
-		Object.fromEntries(fields.map((f) => [f.name, values[f.name] ?? defaults[f.type] ?? '']))
-	)
+	let formData = $state<Record<string, unknown>>({})
+
+	$effect(() => {
+		formData = Object.fromEntries(
+			fields.map((f) => [f.name, values[f.name] ?? defaults[f.type] ?? ''])
+		)
+	})
 
 	const getFieldError = (name: string) => errors.find((e) => e.field === name)?.message
 
@@ -29,7 +33,7 @@
 
 {#each fields as field, i (field.name)}
 	<p>
-		<span mono>{i === fields.length - 1 && !submitLabel ? '└─' : '├─'}</span>
+		<span class="mono">{i === fields.length - 1 && !submitLabel ? '└─' : '├─'}</span>
 		{field.name}{#if field.required}*{/if}
 		{#if field.type === 'string'}
 			<input
@@ -53,7 +57,7 @@
 				onchange={(e) => (formData[field.name] = (e.target as HTMLInputElement).checked)}
 			/>
 		{:else if field.type === 'array'}
-			<em>{field.items || 'items'}</em>
+			<em>[]</em>
 		{/if}
 		{#if getFieldError(field.name)}
 			<strong>! {getFieldError(field.name)}</strong>

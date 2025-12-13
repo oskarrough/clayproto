@@ -11,7 +11,7 @@ const schemaRkey = await clay.putRecord(SCHEMA, tid(), {
 	fields: [
 		{name: 'title', type: 'string', required: true},
 		{name: 'done', type: 'boolean'},
-		{name: 'tags', type: 'array', items: 'string'}
+		{name: 'tags', type: 'array'}
 	],
 	createdAt: new Date().toISOString()
 })
@@ -62,7 +62,7 @@ await clay.putRecord(SCHEMA, schemaRkey, {
 	fields: [
 		{name: 'title', type: 'string', required: true},
 		{name: 'done', type: 'boolean'},
-		{name: 'tags', type: 'array', items: 'string'},
+		{name: 'tags', type: 'array'},
 		{name: 'priority', type: 'number'}
 	],
 	createdAt: (existingSchema as {createdAt: string}).createdAt

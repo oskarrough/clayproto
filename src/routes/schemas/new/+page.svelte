@@ -65,16 +65,16 @@
 	<main>
 		<p>@{$session?.handle}/</p>
 		<main>
-			<p><span mono>└─</span> <a href="/schemas">schemas/</a></p>
+			<p><span class="mono">└─</span> <a href="/schemas">schemas/</a></p>
 			<main>
-				<!-- <p><span mono>└─</span>+creating new schema/</p> -->
+				<!-- <p><span class="mono">└─</span>+creating new schema/</p> -->
 				<main>
 					{#if error}
 						<p><strong>! {error}</strong></p>
 					{/if}
 					<form onsubmit={handleSubmit}>
 						<p>
-							<span mono>├─</span> name:
+							<span class="mono">├─</span> name:
 							<input
 								type="text"
 								id="{uid}-name"
@@ -84,11 +84,11 @@
 								required
 							/>
 						</p>
-						<p><span mono>├─</span> fields/</p>
+						<p><span class="mono">├─</span> fields/</p>
 						<main>
 							{#each fields as field, i (i)}
 								<p>
-									<span mono>├─</span>
+									<span class="mono">├─</span>
 									<input
 										type="text"
 										bind:value={field.name}
@@ -103,14 +103,6 @@
 											<option value="boolean">boolean</option>
 											<option value="array">array</option>
 										</select>
-										{#if field.type === 'array'}
-											<input
-												type="text"
-												bind:value={field.items}
-												placeholder="item type"
-												disabled={submitting}
-											/>
-										{/if}
 									</em>
 									<label
 										><input type="checkbox" bind:checked={field.required} disabled={submitting} /> *</label
@@ -124,12 +116,12 @@
 								</p>
 							{/each}
 							<p>
-								<span mono>└─</span>
+								<span class="mono">└─</span>
 								<button data-text type="button" onclick={addField} disabled={submitting}>+</button>
 							</p>
 						</main>
 						<p>
-							<span mono>└─</span>
+							<span class="mono">└─</span>
 							<button type="submit" disabled={submitting}>
 								{#if submitting}<em>creating...</em>{:else}save{/if}
 							</button>

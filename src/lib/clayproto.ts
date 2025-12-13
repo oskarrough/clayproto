@@ -10,7 +10,6 @@ export const ITEM = 'ar.0sk.clayproto.item'
 export interface SchemaField {
 	name: string
 	type: 'string' | 'number' | 'boolean' | 'array'
-	items?: string
 	required?: boolean
 }
 

@@ -63,18 +63,18 @@
 	<main>
 		<p>@{$session?.handle}/</p>
 		<main>
-			<p><span mono>└─</span> <a href="/schemas">schemas/</a></p>
+			<p><span class="mono">└─</span> <a href="/schemas">schemas/</a></p>
 			<main>
 				{#if loading}
 					<p><em>loading...</em></p>
 				{:else if error && !schema}
 					<p><strong>! {error}</strong></p>
 				{:else if schema}
-					<p><span mono>└─</span> <a href="/schemas/{params.rkey}">{schema.name}/</a></p>
+					<p><span class="mono">└─</span> <a href="/schemas/{params.rkey}">{schema.name}/</a></p>
 					<main>
-						<p><span mono>└─</span> items/</p>
+						<p><span class="mono">└─</span> items/</p>
 						<main>
-							<p><span mono>└─</span>+/</p>
+							<p><span class="mono">└─</span>+/</p>
 							<main>
 								{#if error}
 									<p><strong>! {error}</strong></p>

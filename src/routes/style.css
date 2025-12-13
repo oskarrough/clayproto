@@ -11,7 +11,7 @@ html {
 	line-height: 1;
 }
 
-[mono] {
+.mono {
 	font-family: var(--font-mono);
 }
 

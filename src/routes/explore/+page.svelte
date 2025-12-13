@@ -97,15 +97,15 @@
 					<div class="tree">
 						<p>@{demoHandle}/</p>
 						<main>
-							<p><span mono>└─</span> schemas/</p>
+							<p><span class="mono">└─</span> schemas/</p>
 							<main>
-								<p><span mono>└─</span> {demoSchema.name}/</p>
+								<p><span class="mono">└─</span> {demoSchema.name}/</p>
 								<main>
-									<p><span mono>├─</span> fields/</p>
+									<p><span class="mono">├─</span> fields/</p>
 									<main>
 										{#each demoSchema.fields as field, i (field.name)}
 											<p>
-												<span mono>{i === demoSchema.fields.length - 1 ? '└─' : '├─'}</span>
+												<span class="mono">{i === demoSchema.fields.length - 1 ? '└─' : '├─'}</span>
 												<button
 													class="field-btn"
 													class:selected={selectedField === i}
@@ -117,11 +117,11 @@
 											</p>
 										{/each}
 									</main>
-									<p><span mono>└─</span> items/</p>
+									<p><span class="mono">└─</span> items/</p>
 									<main>
 										{#each demoItems as item, i (item.rkey)}
 											<p>
-												<span mono>{i === demoItems.length - 1 ? '└─' : '├─'}</span>
+												<span class="mono">{i === demoItems.length - 1 ? '└─' : '├─'}</span>
 												<button
 													class="item-btn"
 													class:selected={selectedItem === i}

@@ -80,19 +80,19 @@
 	<main>
 		<p>@{$session?.handle}/</p>
 		<main>
-			<p><span mono>└─</span> <a href="/schemas">schemas/</a></p>
+			<p><span class="mono">└─</span> <a href="/schemas">schemas/</a></p>
 			<main>
 				{#if loading}
 					<p><em>loading...</em></p>
 				{:else if error && !schema}
 					<p><strong>! {error}</strong></p>
 				{:else if schema && item}
-					<p><span mono>└─</span> <a href="/schemas/{params.rkey}">{schema.name}/</a></p>
+					<p><span class="mono">└─</span> <a href="/schemas/{params.rkey}">{schema.name}/</a></p>
 					<main>
-						<p><span mono>└─</span> items/</p>
+						<p><span class="mono">└─</span> items/</p>
 						<main>
 							<p>
-								<span mono>└─</span>
+								<span class="mono">└─</span>
 								{schema.fields
 									.slice(0, 2)
 									.map((f) => item?.data[f.name])

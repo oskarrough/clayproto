@@ -32,9 +32,10 @@
 		<main>
 			<p>@{$session.handle}/</p>
 			<main>
-				<p><span mono>├─</span> <a href="/schemas">schemas/</a></p>
+				<p><span class="mono">├─</span> <a href="/schemas">schemas/</a></p>
 				<p>
-					<span mono>└─</span> <button data-text type="button" onclick={signOut}>logout</button>
+					<span class="mono">└─</span>
+					<button data-text type="button" onclick={signOut}>logout</button>
 				</p>
 			</main>
 		</main>
@@ -42,7 +43,7 @@
 		<main>
 			<form onsubmit={signIn}>
 				<p>
-					<span mono>└─</span>
+					<span class="mono">└─</span>
 					<input
 						type="text"
 						bind:value={handle}

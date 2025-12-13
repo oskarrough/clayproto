@@ -55,7 +55,7 @@
 	<main>
 		<p>@{$session?.handle}/</p>
 		<main>
-			<p><span mono>└─</span> <a href="/schemas">schemas/</a></p>
+			<p><span class="mono">└─</span> <a href="/schemas">schemas/</a></p>
 			<main>
 				{#if loading}
 					<p><em>loading...</em></p>
@@ -63,7 +63,7 @@
 					<p><strong>! {error}</strong></p>
 				{:else if schema}
 					<p>
-						<span mono>└─</span>
+						<span class="mono">└─</span>
 						{schema.name}/ <a href="/schemas/{$page.params.rkey}/edit">✎</a>
 						<button data-text onclick={handleDelete} disabled={deleting}
 							>{#if deleting}<em>…</em>{:else}×{/if}</button
@@ -77,13 +77,13 @@
 								.filter(Boolean)
 								.join(' ')}
 							<p>
-								<span mono>{i === items.length - 1 && items.length > 0 ? '├─' : '├─'}</span>
+								<span class="mono">{i === items.length - 1 && items.length > 0 ? '├─' : '├─'}</span>
 								<a href="/schemas/{$page.params.rkey}/items/{itemRkey}/edit"
 									>{preview || itemRkey}</a
 								>
 							</p>
 						{/each}
-						<p><span mono>└─</span> <a href="/schemas/{$page.params.rkey}/new">+</a></p>
+						<p><span class="mono">└─</span> <a href="/schemas/{$page.params.rkey}/new">+</a></p>
 					</main>
 				{/if}
 			</main>
