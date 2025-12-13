@@ -3,8 +3,8 @@ import {TID} from '@atproto/common-web'
 import {atprotoOAuth} from './atproto-oauth'
 
 // Collections
-export const SCHEMA = 'app.clayproto.schema'
-export const ITEM = 'app.clayproto.item'
+export const SCHEMA = 'ar.0sk.clayproto.schema'
+export const ITEM = 'ar.0sk.clayproto.item'
 
 // Types
 export interface SchemaField {

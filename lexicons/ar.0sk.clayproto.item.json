@@ -1,6 +1,6 @@
 {
 	"lexicon": 1,
-	"id": "app.clayproto.item",
+	"id": "ar.0sk.clayproto.item",
 	"defs": {
 		"main": {
 			"type": "record",

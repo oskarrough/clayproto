@@ -1,7 +1,7 @@
 <script lang="ts">
 	// Demo data - no auth needed
 	const demoSchema = {
-		$type: 'app.clayproto.schema',
+		$type: 'ar.0sk.clayproto.schema',
 		name: 'books',
 		fields: [
 			{name: 'title', type: 'string', required: true},
@@ -32,14 +32,14 @@
 	let selectedField = $state<number | null>(null)
 
 	function cycleLayer() {
-		const layers: typeof layer[] = ['surface', 'structure', 'protocol', 'address']
+		const layers: (typeof layer)[] = ['surface', 'structure', 'protocol', 'address']
 		const idx = layers.indexOf(layer)
 		layer = layers[(idx + 1) % layers.length]
 	}
 
 	function buildItemRecord(item: (typeof demoItems)[0]) {
 		return {
-			$type: 'app.clayproto.item',
+			$type: 'ar.0sk.clayproto.item',
 			schema: demoSchemaRkey,
 			data: item.data,
 			createdAt: '2025-01-15T11:00:00.000Z'
@@ -58,7 +58,9 @@
 		}
 		const entries = Object.entries(obj)
 		if (entries.length === 0) return '{}'
-		const props = entries.map(([k, v]) => `${pad}  "${k}": ${formatJson(v, indent + 1)}`).join(',\n')
+		const props = entries
+			.map(([k, v]) => `${pad}  "${k}": ${formatJson(v, indent + 1)}`)
+			.join(',\n')
 		return `{\n${props}\n${pad}}`
 	}
 </script>
@@ -70,9 +72,15 @@
 
 		<main>
 			<section class="essay">
-				<p class="prose">your Bluesky account comes with a personal data server. it holds your posts, your follows, your likes. but it can hold more.</p>
+				<p class="prose">
+					your Bluesky account comes with a personal data server. it holds your posts, your follows,
+					your likes. but it can hold more.
+				</p>
 
-				<p class="prose">clayproto lets you define your own data structures and store them there. same infrastructure, any shape you want.</p>
+				<p class="prose">
+					clayproto lets you define your own data structures and store them there. same
+					infrastructure, any shape you want.
+				</p>
 			</section>
 
 			<section class="demo">
@@ -144,28 +152,35 @@
 					{/if}
 				{:else if layer === 'structure'}
 					<div class="structure">
-						<p class="prose">a schema is an object with a name and fields. each field has a name and type.</p>
+						<p class="prose">
+							a schema is an object with a name and fields. each field has a name and type.
+						</p>
 
 						<div class="code-panel">
-							<p class="detail-label">app.clayproto.schema</p>
+							<p class="detail-label">ar.0sk.clayproto.schema</p>
 							<pre>{formatJson(demoSchema)}</pre>
 						</div>
 
-						<p class="prose">an item references a schema by its record key. data is freeform but should match the schema.</p>
+						<p class="prose">
+							an item references a schema by its record key. data is freeform but should match the
+							schema.
+						</p>
 
 						<div class="code-panel">
-							<p class="detail-label">app.clayproto.item</p>
+							<p class="detail-label">ar.0sk.clayproto.item</p>
 							<pre>{formatJson(buildItemRecord(demoItems[0]))}</pre>
 						</div>
 					</div>
 				{:else if layer === 'protocol'}
 					<div class="protocol">
-						<p class="prose">under the hood: ATProto stores records in collections. each record has a URI.</p>
+						<p class="prose">
+							under the hood: ATProto stores records in collections. each record has a URI.
+						</p>
 
 						<div class="code-panel">
 							<p class="detail-label">collection</p>
-							<pre>app.clayproto.schema</pre>
-							<pre>app.clayproto.item</pre>
+							<pre>ar.0sk.clayproto.schema</pre>
+							<pre>ar.0sk.clayproto.item</pre>
 						</div>
 
 						<p class="prose">the API is simple. four operations.</p>
@@ -182,32 +197,41 @@ deleteRecord(repo, collection, rkey)</pre>
 					</div>
 				{:else if layer === 'address'}
 					<div class="address">
-						<p class="prose">every record has an address. a URI that works anywhere in the atmosphere.</p>
+						<p class="prose">
+							every record has an address. a URI that works anywhere in the atmosphere.
+						</p>
 
 						<div class="code-panel">
 							<p class="detail-label">schema URI</p>
-							<pre>at://{demoDid}/app.clayproto.schema/{demoSchemaRkey}</pre>
+							<pre>at://{demoDid}/ar.0sk.clayproto.schema/{demoSchemaRkey}</pre>
 						</div>
 
 						<div class="code-panel">
 							<p class="detail-label">item URI</p>
-							<pre>at://{demoDid}/app.clayproto.item/{demoItems[0].rkey}</pre>
+							<pre>at://{demoDid}/ar.0sk.clayproto.item/{demoItems[0].rkey}</pre>
 						</div>
 
-						<p class="prose">anyone can read public records. your PDS is a server. your data has URLs.</p>
+						<p class="prose">
+							anyone can read public records. your PDS is a server. your data has URLs.
+						</p>
 
 						<div class="code-panel">
 							<p class="detail-label">HTTP equivalent</p>
-							<pre>https://bsky.social/xrpc/com.atproto.repo.getRecord?repo={demoDid}&collection=app.clayproto.schema&rkey={demoSchemaRkey}</pre>
+							<pre>https://bsky.social/xrpc/com.atproto.repo.getRecord?repo={demoDid}&collection=ar.0sk.clayproto.schema&rkey={demoSchemaRkey}</pre>
 						</div>
 
-						<p class="prose">this is what "portable" means. not export/import. live, addressable, queryable.</p>
+						<p class="prose">
+							this is what "portable" means. not export/import. live, addressable, queryable.
+						</p>
 					</div>
 				{/if}
 			</section>
 
 			<section class="essay">
-				<p class="prose">the question is not where your data lives. it is whether you can reach it without asking permission.</p>
+				<p class="prose">
+					the question is not where your data lives. it is whether you can reach it without asking
+					permission.
+				</p>
 			</section>
 		</main>
 	</main>

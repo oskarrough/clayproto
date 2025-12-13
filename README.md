@@ -31,8 +31,8 @@ portable, queryable, yours.
 two record types in your PDS:
 
 ```
-app.clayproto.schema   — field definitions
-app.clayproto.item     — data referencing a schema
+ar.0sk.clayproto.schema   — field definitions
+ar.0sk.clayproto.item     — data referencing a schema
 ```
 
 auth via any ATProto account. query your data directly via the ATProto API — clayproto is just one interface.

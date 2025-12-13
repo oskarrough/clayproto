@@ -3,7 +3,7 @@
 	"client_name": "clayproto",
 	"client_uri": "https://clayproto.0sk.ar",
 	"redirect_uris": ["https://clayproto.0sk.ar/"],
-	"scope": "atproto repo:app.clayproto.schema?action=create repo:app.clayproto.schema?action=update repo:app.clayproto.schema?action=delete repo:app.clayproto.item?action=create repo:app.clayproto.item?action=update repo:app.clayproto.item?action=delete",
+	"scope": "atproto repo:ar.0sk.clayproto.schema?action=create repo:ar.0sk.clayproto.schema?action=update repo:ar.0sk.clayproto.schema?action=delete repo:ar.0sk.clayproto.item?action=create repo:ar.0sk.clayproto.item?action=update repo:ar.0sk.clayproto.item?action=delete",
 	"grant_types": ["authorization_code", "refresh_token"],
 	"response_types": ["code"],
 	"application_type": "web",
