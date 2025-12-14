@@ -51,7 +51,8 @@
 </main>
 
 <style>
-	main {
+	main,
+	footer {
 		margin: 1rem;
 	}
 </style>

@@ -26,24 +26,23 @@
 	}
 </script>
 
-<main>
+<nav>
 	<p>clayproto/</p>
 	{#if $session}
-		<main>
-			<p>@{$session.handle}/</p>
-			<main>
-				<p><span class="mono">├─</span> <a href="/schemas">schemas/</a></p>
-				<p>
-					<span class="mono">└─</span>
-					<button data-text type="button" onclick={signOut}>logout</button>
-				</p>
-			</main>
-		</main>
+		<nav>
+			<div>
+				@{$session.handle}/
+				<menu><button data-text type="button" onclick={signOut}>logout</button></menu>
+			</div>
+			<nav>
+				<p><a href="/schemas">schemas/</a></p>
+				<p><a href="/about">about/</a></p>
+			</nav>
+		</nav>
 	{:else}
-		<main>
+		<nav>
 			<form onsubmit={signIn}>
 				<p>
-					<span class="mono">└─</span>
 					<input
 						type="text"
 						bind:value={handle}
@@ -59,6 +58,6 @@
 			{#if error}
 				<p><strong>! {error}</strong></p>
 			{/if}
-		</main>
+		</nav>
 	{/if}
-</main>
+</nav>

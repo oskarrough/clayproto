@@ -60,75 +60,66 @@
 	}
 </script>
 
-<main>
+<nav>
 	<p><a href="/">clayproto/</a></p>
-	<main>
+	<nav>
 		<p>@{$session?.handle}/</p>
-		<main>
-			<p><span class="mono">└─</span> <a href="/schemas">schemas/</a></p>
-			<main>
-				<!-- <p><span class="mono">└─</span>+creating new schema/</p> -->
-				<main>
-					{#if error}
-						<p><strong>! {error}</strong></p>
-					{/if}
-					<form onsubmit={handleSubmit}>
-						<p>
-							<span class="mono">├─</span> name:
-							<input
-								type="text"
-								id="{uid}-name"
-								bind:value={name}
-								placeholder="track"
-								disabled={submitting}
-								required
-							/>
-						</p>
-						<p><span class="mono">├─</span> fields/</p>
-						<main>
-							{#each fields as field, i (i)}
-								<p>
-									<span class="mono">├─</span>
-									<input
-										type="text"
-										bind:value={field.name}
-										placeholder="name"
-										disabled={submitting}
-										required
-									/>
-									<em>
-										<select bind:value={field.type} disabled={submitting} required>
-											<option value="string">string</option>
-											<option value="number">number</option>
-											<option value="boolean">boolean</option>
-											<option value="array">array</option>
-										</select>
-									</em>
-									<label
-										><input type="checkbox" bind:checked={field.required} disabled={submitting} /> *</label
-									>
-									<button
-										data-text
-										type="button"
-										onclick={() => removeField(i)}
-										disabled={submitting}>×</button
-									>
-								</p>
-							{/each}
+		<nav>
+			<p><a href="/schemas">schemas/</a></p>
+			<nav>
+				{#if error}
+					<p><strong>! {error}</strong></p>
+				{/if}
+				<form onsubmit={handleSubmit}>
+					<p>
+						name:
+						<input
+							type="text"
+							id="{uid}-name"
+							bind:value={name}
+							placeholder="track"
+							disabled={submitting}
+							required
+						/>
+					</p>
+					<p>fields/</p>
+					<nav>
+						{#each fields as field, i (i)}
 							<p>
-								<span class="mono">└─</span>
-								<button data-text type="button" onclick={addField} disabled={submitting}>+</button>
+								<input
+									type="text"
+									bind:value={field.name}
+									placeholder="name"
+									disabled={submitting}
+									required
+								/>
+								<em>
+									<select bind:value={field.type} disabled={submitting} required>
+										<option value="string">string</option>
+										<option value="number">number</option>
+										<option value="boolean">boolean</option>
+										<option value="array">array</option>
+									</select>
+								</em>
+								<label
+									><input type="checkbox" bind:checked={field.required} disabled={submitting} /> *</label
+								>
+								<button data-text type="button" onclick={() => removeField(i)} disabled={submitting}
+									>×</button
+								>
 							</p>
-						</main>
+						{/each}
 						<p>
-							<span class="mono">└─</span>
-							<button type="submit" disabled={submitting}>
-								{#if submitting}<em>creating...</em>{:else}save{/if}
-							</button>
+							<button data-text type="button" onclick={addField} disabled={submitting}>+</button>
 						</p>
-					</form>
-				</main>
-			</main>
-		</main>
-	</main>
-</main>
+					</nav>
+					<p>
+						<button type="submit" disabled={submitting}>
+							{#if submitting}<em>creating...</em>{:else}save{/if}
+						</button>
+					</p>
+				</form>
+			</nav>
+		</nav>
+	</nav>
+</nav>

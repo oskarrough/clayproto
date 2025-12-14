@@ -25,31 +25,28 @@
 	})
 </script>
 
-<main>
+<nav>
 	<p><a href="/">clayproto/</a></p>
-	<main>
+	<nav>
 		<p>@{$session?.handle}/</p>
-		<main>
-			<p><span class="mono">├─</span> schemas/</p>
-			<main>
+		<nav>
+			<div>
+				schemas/
+				<menu><a href="/schemas/new">+new</a></menu>
+			</div>
+			<nav>
 				{#if loading}
 					<p><em>loading...</em></p>
 				{:else if error}
 					<p><strong>! {error}</strong></p>
+				{:else if schemas.length === 0}
+					<p><em>(empty)</em></p>
 				{:else}
-					{#if schemas.length === 0}
-						<p><em>(empty)</em></p>
-					{:else}
-						{#each schemas as { rkey, schema } (rkey)}
-							<p>
-								<span class="mono">├─</span>
-								<a href="/schemas/{rkey}">{schema.name || `(${rkey})`}/</a>
-							</p>
-						{/each}
-					{/if}
-					<p><span class="mono">└─</span> <a href="/schemas/new">+</a></p>
+					{#each schemas as { rkey, schema } (rkey)}
+						<p><a href="/schemas/{rkey}">{schema.name || `(${rkey})`}/</a></p>
+					{/each}
 				{/if}
-			</main>
-		</main>
-	</main>
-</main>
+			</nav>
+		</nav>
+	</nav>
+</nav>

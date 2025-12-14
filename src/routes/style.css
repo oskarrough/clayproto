@@ -5,14 +5,10 @@
 html {
 	scrollbar-gutter: stable;
 	font-family: 'Inter', sans-serif;
-	font-size: 20px;
 	font-optical-sizing: auto;
 	font-style: normal;
-	line-height: 1;
-}
-
-.mono {
-	font-family: var(--font-mono);
+	line-height: 1.2; /* 24px */
+	font-size: 20px;
 }
 
 :where(audio, iframe, img, svg, video) {
@@ -57,13 +53,19 @@ nav {
 	margin-bottom: 1rem;
 }
 
-nav p::before {
+nav > p::before,
+nav > div::before {
 	content: '▸ ';
 }
 
 main main,
 nav nav {
 	margin-inline-start: 1rem;
+}
+
+menu {
+	display: inline;
+	padding: 0;
 }
 
 button[data-text],

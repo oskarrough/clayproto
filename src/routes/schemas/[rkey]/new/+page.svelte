@@ -58,39 +58,36 @@
 	}
 </script>
 
-<main>
+<nav>
 	<p><a href="/">clayproto/</a></p>
-	<main>
+	<nav>
 		<p>@{$session?.handle}/</p>
-		<main>
-			<p><span class="mono">└─</span> <a href="/schemas">schemas/</a></p>
-			<main>
+		<nav>
+			<p><a href="/schemas">schemas/</a></p>
+			<nav>
 				{#if loading}
 					<p><em>loading...</em></p>
 				{:else if error && !schema}
 					<p><strong>! {error}</strong></p>
 				{:else if schema}
-					<p><span class="mono">└─</span> <a href="/schemas/{params.rkey}">{schema.name}/</a></p>
-					<main>
-						<p><span class="mono">└─</span> items/</p>
-						<main>
-							<p><span class="mono">└─</span>+/</p>
-							<main>
-								{#if error}
-									<p><strong>! {error}</strong></p>
-								{/if}
-								<form onsubmit={handleSubmit}>
-									<DynamicForm
-										bind:this={dynamicForm}
-										fields={schema.fields}
-										submitLabel={submitting ? 'saving...' : 'save'}
-									/>
-								</form>
-							</main>
-						</main>
-					</main>
+					<p><a href="/schemas/{params.rkey}">{schema.name}/</a></p>
+					<nav>
+						<p>+</p>
+						<nav>
+							{#if error}
+								<p><strong>! {error}</strong></p>
+							{/if}
+							<form onsubmit={handleSubmit}>
+								<DynamicForm
+									bind:this={dynamicForm}
+									fields={schema.fields}
+									submitLabel={submitting ? 'saving...' : 'save'}
+								/>
+							</form>
+						</nav>
+					</nav>
 				{/if}
-			</main>
-		</main>
-	</main>
-</main>
+			</nav>
+		</nav>
+	</nav>
+</nav>

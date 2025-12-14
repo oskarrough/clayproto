@@ -50,43 +50,44 @@
 	})
 </script>
 
-<main>
+<nav>
 	<p><a href="/">clayproto/</a></p>
-	<main>
+	<nav>
 		<p>@{$session?.handle}/</p>
-		<main>
-			<p><span class="mono">└─</span> <a href="/schemas">schemas/</a></p>
-			<main>
+		<nav>
+			<p><a href="/schemas">schemas/</a></p>
+			<nav>
 				{#if loading}
 					<p><em>loading...</em></p>
 				{:else if error}
 					<p><strong>! {error}</strong></p>
 				{:else if schema}
-					<p>
-						<span class="mono">└─</span>
-						{schema.name}/ <a href="/schemas/{$page.params.rkey}/edit">✎</a>
-						<button data-text onclick={handleDelete} disabled={deleting}
-							>{#if deleting}<em>…</em>{:else}×{/if}</button
-						>
-					</p>
-					<main>
-						{#each items as { rkey: itemRkey, item }, i (itemRkey)}
+					<div>
+						{schema.name}
+						<menu>
+							<a href="/schemas/{$page.params.rkey}/new">+new</a>
+							<a href="/schemas/{$page.params.rkey}/edit">edit</a>
+							<button data-text onclick={handleDelete} disabled={deleting}
+								>{#if deleting}<em>…</em>{:else}delete{/if}</button
+							>
+						</menu>
+					</div>
+					<nav>
+						{#each items as { rkey: itemRkey, item } (itemRkey)}
 							{@const preview = schema.fields
 								.slice(0, 2)
 								.map((f) => item.data[f.name])
 								.filter(Boolean)
 								.join(' ')}
 							<p>
-								<span class="mono">{i === items.length - 1 && items.length > 0 ? '├─' : '├─'}</span>
 								<a href="/schemas/{$page.params.rkey}/items/{itemRkey}/edit"
 									>{preview || itemRkey}</a
 								>
 							</p>
 						{/each}
-						<p><span class="mono">└─</span> <a href="/schemas/{$page.params.rkey}/new">+</a></p>
-					</main>
+					</nav>
 				{/if}
-			</main>
-		</main>
-	</main>
-</main>
+			</nav>
+		</nav>
+	</nav>
+</nav>

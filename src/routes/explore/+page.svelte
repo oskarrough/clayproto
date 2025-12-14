@@ -65,12 +65,12 @@
 	}
 </script>
 
-<main>
+<nav>
 	<p><a href="/">clayproto/</a></p>
-	<main>
+	<nav>
 		<p>explore/</p>
 
-		<main>
+		<section>
 			<section class="essay">
 				<p class="prose">
 					your Bluesky account comes with a personal data server. it holds your posts, your follows,
@@ -94,18 +94,17 @@
 				</header>
 
 				{#if layer === 'surface'}
-					<div class="tree">
+					<nav class="tree">
 						<p>@{demoHandle}/</p>
-						<main>
-							<p><span class="mono">└─</span> schemas/</p>
-							<main>
-								<p><span class="mono">└─</span> {demoSchema.name}/</p>
-								<main>
-									<p><span class="mono">├─</span> fields/</p>
-									<main>
+						<nav>
+							<p>schemas/</p>
+							<nav>
+								<p>{demoSchema.name}/</p>
+								<nav>
+									<p>fields/</p>
+									<nav>
 										{#each demoSchema.fields as field, i (field.name)}
 											<p>
-												<span class="mono">{i === demoSchema.fields.length - 1 ? '└─' : '├─'}</span>
 												<button
 													class="field-btn"
 													class:selected={selectedField === i}
@@ -116,12 +115,11 @@
 												<em>{field.type}{field.required ? ', required' : ''}</em>
 											</p>
 										{/each}
-									</main>
-									<p><span class="mono">└─</span> items/</p>
-									<main>
+									</nav>
+									<p>items/</p>
+									<nav>
 										{#each demoItems as item, i (item.rkey)}
 											<p>
-												<span class="mono">{i === demoItems.length - 1 ? '└─' : '├─'}</span>
 												<button
 													class="item-btn"
 													class:selected={selectedItem === i}
@@ -131,11 +129,11 @@
 												</button>
 											</p>
 										{/each}
-									</main>
-								</main>
-							</main>
-						</main>
-					</div>
+									</nav>
+								</nav>
+							</nav>
+						</nav>
+					</nav>
 
 					{#if selectedItem !== null}
 						<aside class="detail">
@@ -233,9 +231,9 @@ deleteRecord(repo, collection, rkey)</pre>
 					permission.
 				</p>
 			</section>
-		</main>
-	</main>
-</main>
+		</section>
+	</nav>
+</nav>
 
 <style>
 	.essay {
